@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { locations } from "../data/locations";
 import type { CameraMode, GraphicsQuality } from "../types";
 
 interface MoveInput {
@@ -18,6 +19,7 @@ interface ExperienceState {
   soundEnabled: boolean;
   quality: GraphicsQuality;
   cameraMode: CameraMode;
+  cameraHeight: number;
   moveInput: MoveInput;
   assetsLoaded: boolean;
   setAssetsLoaded: (loaded: boolean) => void;
@@ -31,6 +33,7 @@ interface ExperienceState {
   toggleSound: () => void;
   toggleQuality: () => void;
   toggleCamera: () => void;
+  setCameraHeight: (height: number) => void;
   setMoveInput: (input: MoveInput) => void;
   resetProgress: () => void;
 }
@@ -48,6 +51,7 @@ export const useExperience = create<ExperienceState>()(
       soundEnabled: false,
       quality: "detail",
       cameraMode: "follow",
+      cameraHeight: 18,
       moveInput: { x: 0, z: 0 },
       assetsLoaded: false,
       setAssetsLoaded: (loaded) => set({ assetsLoaded: loaded }),
@@ -66,7 +70,7 @@ export const useExperience = create<ExperienceState>()(
         });
       },
       closeLocation: () => {
-        const complete = get().visitedLocationIds.length === 11;
+        const complete = get().visitedLocationIds.length === locations.length;
         set({ activeLocationId: null, completionOpen: complete });
       },
       setMapOpen: (open) => set({ mapOpen: open, helpOpen: false }),
@@ -77,6 +81,7 @@ export const useExperience = create<ExperienceState>()(
         set((state) => ({ quality: state.quality === "detail" ? "light" : "detail" })),
       toggleCamera: () =>
         set((state) => ({ cameraMode: state.cameraMode === "follow" ? "overview" : "follow" })),
+      setCameraHeight: (height) => set({ cameraHeight: Math.min(30, Math.max(12, height)) }),
       setMoveInput: (input) => set({ moveInput: input }),
       resetProgress: () => set({ visitedLocationIds: [], completionOpen: false }),
     }),
@@ -86,6 +91,7 @@ export const useExperience = create<ExperienceState>()(
         visitedLocationIds: state.visitedLocationIds,
         soundEnabled: state.soundEnabled,
         quality: state.quality,
+        cameraHeight: state.cameraHeight,
       }),
     },
   ),

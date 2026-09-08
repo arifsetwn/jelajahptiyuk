@@ -22,7 +22,7 @@ describe("experience progress", () => {
 
   it("opens completion after the final location modal closes", () => {
     for (const location of locations) useExperience.getState().openLocation(location.id);
-    expect(useExperience.getState().visitedLocationIds).toHaveLength(11);
+    expect(useExperience.getState().visitedLocationIds).toHaveLength(locations.length);
     useExperience.getState().closeLocation();
     expect(useExperience.getState().completionOpen).toBe(true);
   });
@@ -33,5 +33,12 @@ describe("experience progress", () => {
     expect(useExperience.getState().visitedLocationIds).toEqual([]);
     expect(useExperience.getState().soundEnabled).toBe(true);
     expect(useExperience.getState().quality).toBe("light");
+  });
+
+  it("keeps camera height within the supported range", () => {
+    useExperience.getState().setCameraHeight(8);
+    expect(useExperience.getState().cameraHeight).toBe(12);
+    useExperience.getState().setCameraHeight(40);
+    expect(useExperience.getState().cameraHeight).toBe(30);
   });
 });

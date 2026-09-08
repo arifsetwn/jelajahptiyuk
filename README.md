@@ -16,7 +16,7 @@ MVP website eksplorasi kampus 3D untuk promosi Program Studi Pendidikan Teknik I
 ## Fitur
 
 - Diorama kampus low-poly yang dibuat secara procedural tanpa Blender.
-- Sebelas lokasi: empat ruang PTI/FKIP dan tujuh landmark UMS.
+- Lima belas lokasi: lima ruang PTI/FKIP dan sepuluh landmark UMS.
 - Karakter yang dapat dikendalikan dengan keyboard atau tombol arah sentuh.
 - Kamera follow dan overview.
 - Collision karakter dengan gedung.

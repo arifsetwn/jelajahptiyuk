@@ -1,5 +1,6 @@
 import { RoundedBox } from "@react-three/drei";
-import { useMemo } from "react";
+import { useFrame } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { CampusLocation } from "../types";
 import { worldSurfaceTilt, worldSurfaceY } from "../worldGeometry";
@@ -104,7 +105,7 @@ function GateRoof({ position, scale, color }: { position: [number, number, numbe
 
 export function CampusOneGate() {
   const gateX = -19;
-  const gateZ = 30;
+  const gateZ = 26.5;
   const roofRed = "#a94f45";
   const pillar = "#e9e5d8";
 
@@ -190,6 +191,54 @@ function AcademicBuilding({ accent, floors = 3 }: { accent: string; floors?: num
   );
 }
 
+function ILoveFkipLandmark() {
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1400;
+    canvas.height = 280;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.textAlign = "left";
+      context.textBaseline = "middle";
+      context.font = "900 230px Arial, sans-serif";
+      context.fillStyle = "#c92032";
+      context.fillText("I", 22, 142);
+
+      context.beginPath();
+      context.moveTo(205, 237);
+      context.bezierCurveTo(35, 120, 95, 25, 205, 82);
+      context.bezierCurveTo(315, 25, 375, 120, 205, 237);
+      context.fill();
+
+      context.fillStyle = "#f8f8f3";
+      context.fillText("FKIP", 355, 142);
+      context.fillStyle = "#c92032";
+      context.fillText("UMS", 850, 142);
+    }
+    const landmarkTexture = new THREE.CanvasTexture(canvas);
+    landmarkTexture.colorSpace = THREE.SRGBColorSpace;
+    landmarkTexture.anisotropy = 4;
+    return landmarkTexture;
+  }, []);
+
+  return (
+    <group position={[0, 0, 3.5]}>
+      <Box position={[0, 0.16, 0]} scale={[7.6, 0.32, 0.7]} color="#4d555b" radius={0.04} />
+      {[-3.35, -2.05, -0.65, 0.75, 2.15, 3.35].map((x) => (
+        <mesh key={x} position={[x, 0.92, -0.05]} castShadow>
+          <cylinderGeometry args={[0.045, 0.055, 1.5, 6]} />
+          <meshStandardMaterial color="#30383e" roughness={0.9} />
+        </mesh>
+      ))}
+      <mesh position={[0, 1.38, 0.08]} castShadow>
+        <planeGeometry args={[7.4, 1.48]} />
+        <meshBasicMaterial map={texture} transparent alphaTest={0.05} toneMapped={false} side={THREE.DoubleSide} />
+      </mesh>
+    </group>
+  );
+}
+
 function Bookstore() {
   return (
     <group>
@@ -251,48 +300,42 @@ function PointedArchRib({
 }
 
 function SitiWalidah() {
-  const facadeBays = [
-    { x: -5.4, z: -0.86, yaw: -0.23 },
-    { x: -3.6, z: -0.3, yaw: -0.14 },
-    { x: -1.8, z: 0.06, yaw: -0.07 },
-    { x: 0, z: 0.18, yaw: 0 },
-    { x: 1.8, z: 0.06, yaw: 0.07 },
-    { x: 3.6, z: -0.3, yaw: 0.14 },
-    { x: 5.4, z: -0.86, yaw: 0.23 },
-  ];
+  const facadeBays = [-1.05, -0.7, -0.35, 0, 0.35, 0.7, 1.05];
   const floorBands = [2.05, 3.03, 4.01, 4.99, 5.97, 6.95];
 
   return (
     <group scale={[0.9, 0.84, 0.9]}>
-      <mesh position={[0, 4.35, -0.16]} scale={[1, 1, 0.43]} castShadow receiveShadow>
+      <mesh position={[0, 4.35, -0.16]} castShadow receiveShadow>
         <cylinderGeometry args={[6.55, 6.55, 7.75, 24]} />
         <meshStandardMaterial color="#e8e1d2" flatShading roughness={0.82} />
       </mesh>
 
-      {facadeBays.map(({ x, z, yaw }, bayIndex) => {
+      {facadeBays.map((angle, bayIndex) => {
         const isCenter = bayIndex === 3;
+        const x = Math.sin(angle) * 6.42;
+        const z = Math.cos(angle) * 6.42;
         return (
-          <group key={x} position={[x, 0, z]} rotation={[0, yaw, 0]}>
-            <Box position={[0, 4.35, 2.13]} scale={[2.05, 7.75, 0.42]} color="#e8e1d2" radius={0.06} />
+          <group key={angle} position={[x, 0, z]} rotation={[0, angle, 0]}>
+            <Box position={[0, 4.35, 0]} scale={[2.05, 7.75, 0.42]} color="#e8e1d2" radius={0.06} />
 
             {floorBands.map((y) => (
               <group key={y}>
                 <Box
-                  position={[0, y, 2.365]}
+                  position={[0, y, 0.235]}
                   scale={[1.64, 0.43, 0.12]}
                   color={isCenter ? "#75aeb9" : "#79aeb8"}
                   radius={0.025}
                 />
-                <Box position={[0, y - 0.34, 2.405]} scale={[1.92, 0.13, 0.16]} color="#f4eddd" radius={0.025} />
+                <Box position={[0, y - 0.34, 0.275]} scale={[1.92, 0.13, 0.16]} color="#f4eddd" radius={0.025} />
               </group>
             ))}
 
-            {!isCenter && <PointedArchRib width={1.48} shoulderY={6.65} peakY={8.12} z={2.47} />}
+            {!isCenter && <PointedArchRib width={1.48} shoulderY={6.65} peakY={8.12} z={0.34} />}
 
             {[-0.68, -0.34, 0, 0.34, 0.68].map((finX) => (
               <Box
                 key={finX}
-                position={[finX, 8.08, 2.42]}
+                position={[finX, 8.08, 0.3]}
                 scale={[0.1, 0.84, 0.2]}
                 color="#d7d1c3"
                 radius={0.02}
@@ -302,57 +345,61 @@ function SitiWalidah() {
         );
       })}
 
-      <Box position={[0, 5.2, 2.53]} scale={[2.55, 6.15, 0.2]} color="#176b8c" radius={0.04} />
-      <Box position={[0, 4.72, 2.66]} scale={[1.36, 5.15, 0.13]} color="#6fa7b1" radius={0.035} />
+      <Box position={[0, 5.2, 6.53]} scale={[2.55, 6.15, 0.2]} color="#176b8c" radius={0.04} />
+      <Box position={[0, 4.72, 6.66]} scale={[1.36, 5.15, 0.13]} color="#6fa7b1" radius={0.035} />
       {[-0.98, 0.98].flatMap((x) =>
         [3.05, 3.75, 4.45, 5.15, 5.85, 6.55, 7.25].map((y) => (
-          <mesh key={`ornament-${x}-${y}`} position={[x, y, 2.67]} rotation={[0, 0, Math.PI / 4]} castShadow>
+          <mesh key={`ornament-${x}-${y}`} position={[x, y, 6.67]} rotation={[0, 0, Math.PI / 4]} castShadow>
             <boxGeometry args={[0.24, 0.24, 0.1]} />
             <meshStandardMaterial color="#8fc2c3" roughness={0.72} />
           </mesh>
         )),
       )}
-      <PointedArchRib width={2.12} shoulderY={6.55} peakY={8.45} z={2.78} thickness={0.22} />
+      <PointedArchRib width={2.12} shoulderY={6.55} peakY={8.45} z={6.78} thickness={0.22} />
 
       {[-0.54, 0, 0.54].map((x) => (
-        <Box key={`portal-${x}`} position={[x, 4.65, 2.81]} scale={[0.11, 5.1, 0.13]} color="#eee7d8" radius={0.02} />
+        <Box key={`portal-${x}`} position={[x, 4.65, 6.81]} scale={[0.11, 5.1, 0.13]} color="#eee7d8" radius={0.02} />
       ))}
       {[-0.48, 0, 0.48].map((x, index) => (
         <group key={`lattice-${x}`}>
-          <mesh position={[x, 6.06, 2.84]} rotation={[0, 0, -0.4 + index * 0.4]} castShadow>
+          <mesh position={[x, 6.06, 6.84]} rotation={[0, 0, -0.4 + index * 0.4]} castShadow>
             <boxGeometry args={[0.1, 3.15, 0.12]} />
             <meshStandardMaterial color="#eee7d8" roughness={0.72} />
           </mesh>
-          <mesh position={[x, 6.06, 2.85]} rotation={[0, 0, 0.4 - index * 0.4]} castShadow>
+          <mesh position={[x, 6.06, 6.85]} rotation={[0, 0, 0.4 - index * 0.4]} castShadow>
             <boxGeometry args={[0.1, 3.15, 0.12]} />
             <meshStandardMaterial color="#eee7d8" roughness={0.72} />
           </mesh>
         </group>
       ))}
 
-      <mesh position={[0, 8.64, -0.18]} scale={[1, 1, 0.68]} castShadow receiveShadow>
+      <mesh position={[0, 8.64, -0.18]} castShadow receiveShadow>
         <cylinderGeometry args={[7.08, 7.08, 0.48, 32]} />
         <meshStandardMaterial color="#d6d0c4" flatShading roughness={0.78} />
       </mesh>
-      <mesh position={[0, 8.91, -0.2]} scale={[1, 1, 0.68]} castShadow receiveShadow>
+      <mesh position={[0, 8.91, -0.2]} castShadow receiveShadow>
         <cylinderGeometry args={[5.82, 5.82, 0.12, 32]} />
         <meshStandardMaterial color="#aeb2ad" flatShading roughness={0.82} />
       </mesh>
-      <mesh position={[0, 8.99, -0.18]} scale={[1, 1, 0.66]} castShadow receiveShadow>
+      <mesh position={[0, 8.99, -0.18]} castShadow receiveShadow>
         <cylinderGeometry args={[4.55, 4.55, 0.1, 32]} />
         <meshStandardMaterial color="#d9d6ca" flatShading roughness={0.8} />
       </mesh>
-      {facadeBays.map(({ x, z, yaw }) => (
-        <group key={`roof-fascia-${x}`} position={[x, 8.38, z]} rotation={[0, yaw, 0]}>
-          <Box position={[0, 0, 2.48]} scale={[2.08, 0.16, 0.28]} color="#90938f" radius={0.025} />
+      {facadeBays.map((angle) => (
+        <group
+          key={`roof-fascia-${angle}`}
+          position={[Math.sin(angle) * 6.42, 8.38, Math.cos(angle) * 6.42]}
+          rotation={[0, angle, 0]}
+        >
+          <Box position={[0, 0, 0.14]} scale={[2.08, 0.16, 0.28]} color="#90938f" radius={0.025} />
         </group>
       ))}
 
-      <Box position={[0, 1.1, 3.38]} scale={[12.1, 0.3, 1.42]} color="#e2dac9" radius={0.1} />
-      <Box position={[0, 0.7, 2.53]} scale={[4.2, 1.34, 0.18]} color="#24485b" radius={0.035} />
-      <Box position={[0, 1.28, 4.05]} scale={[7.6, 0.27, 0.12]} color="#8a7052" radius={0.025} />
+      <Box position={[0, 1.1, 7.1]} scale={[12.1, 0.3, 1.42]} color="#e2dac9" radius={0.1} />
+      <Box position={[0, 0.7, 6.66]} scale={[4.2, 1.34, 0.18]} color="#24485b" radius={0.035} />
+      <Box position={[0, 1.28, 7.75]} scale={[7.6, 0.27, 0.12]} color="#8a7052" radius={0.025} />
       {[-4.9, -3.2, 3.2, 4.9].map((x) => (
-        <mesh key={`support-${x}`} position={[x, 0.64, 3.16]} rotation={[0, 0, x < 0 ? -0.32 : 0.32]} castShadow>
+        <mesh key={`support-${x}`} position={[x, 0.64, 7]} rotation={[0, 0, x < 0 ? -0.32 : 0.32]} castShadow>
           <boxGeometry args={[0.22, 1.35, 0.28]} />
           <meshStandardMaterial color="#cfc7b8" roughness={0.8} />
         </mesh>
@@ -361,22 +408,22 @@ function SitiWalidah() {
       {[0, 1, 2, 3, 4].map((step) => (
         <Box
           key={`step-${step}`}
-          position={[0, 0.07 + step * 0.07, 5.48 - step * 0.33]}
+          position={[0, 0.07 + step * 0.07, 9.2 - step * 0.33]}
           scale={[11.2 - step * 0.34, 0.14, 0.72]}
           color={step % 2 === 0 ? "#bdb9ae" : "#d3cec2"}
           radius={0.025}
         />
       ))}
 
-      <mesh position={[0, 1.5, 5.74]} castShadow>
+      <mesh position={[0, 1.5, 9.45]} castShadow>
         <cylinderGeometry args={[0.035, 0.045, 2.75, 8]} />
         <meshStandardMaterial color="#6f7473" roughness={0.65} />
       </mesh>
-      <mesh position={[0.29, 2.32, 5.75]} castShadow>
+      <mesh position={[0.29, 2.32, 9.46]} castShadow>
         <planeGeometry args={[0.58, 0.38]} />
         <meshStandardMaterial color="#c5413b" side={2} />
       </mesh>
-      <mesh position={[0.29, 2.13, 5.75]} castShadow>
+      <mesh position={[0.29, 2.13, 9.46]} castShadow>
         <planeGeometry args={[0.58, 0.38]} />
         <meshStandardMaterial color="#f4f0e8" side={2} />
       </mesh>
@@ -592,20 +639,65 @@ function Tree({ position, scale = 1 }: { position: [number, number, number]; sca
   );
 }
 
+function SwimmingDuck({ radius, speed, phase, scale = 1 }: { radius: number; speed: number; phase: number; scale?: number }) {
+  const duck = useRef<THREE.Group>(null);
+
+  useFrame(({ clock }) => {
+    if (!duck.current) return;
+    const angle = clock.elapsedTime * speed + phase;
+    duck.current.position.set(Math.cos(angle) * radius, 0.22, Math.sin(angle) * radius * 0.62);
+    const velocityX = -Math.sin(angle) * radius * speed;
+    const velocityZ = Math.cos(angle) * radius * 0.62 * speed;
+    duck.current.rotation.y = Math.atan2(-velocityX, -velocityZ);
+    duck.current.position.y += Math.sin(clock.elapsedTime * 3 + phase) * 0.025;
+  });
+
+  return (
+    <group ref={duck} scale={scale}>
+      <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -0.16, 0]}>
+        <torusGeometry args={[0.48, 0.035, 6, 18]} />
+        <meshBasicMaterial color="#d8f4f5" transparent opacity={0.6} />
+      </mesh>
+      <mesh castShadow scale={[1, 0.68, 1.3]}>
+        <sphereGeometry args={[0.32, 10, 7]} />
+        <meshStandardMaterial color="#f4f0d7" flatShading />
+      </mesh>
+      <mesh position={[0, 0.34, -0.28]} castShadow>
+        <sphereGeometry args={[0.2, 9, 6]} />
+        <meshStandardMaterial color="#f4f0d7" flatShading />
+      </mesh>
+      <mesh position={[0, 0.31, -0.52]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <coneGeometry args={[0.1, 0.28, 4]} />
+        <meshStandardMaterial color="#e99a38" flatShading />
+      </mesh>
+      <mesh position={[-0.24, 0.04, 0.02]} rotation={[0.2, 0, -0.42]} castShadow>
+        <sphereGeometry args={[0.2, 8, 5]} />
+        <meshStandardMaterial color="#dfd9bd" flatShading />
+      </mesh>
+    </group>
+  );
+}
+
 function Lakeside() {
   return (
     <group>
       <mesh position={[0, 0.07, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[5.2, 24]} />
+        <circleGeometry args={[7, 32]} />
         <meshStandardMaterial color="#5eabc0" roughness={0.35} metalness={0.05} />
       </mesh>
-      <Box position={[4.6, 1.05, 0.5]} scale={[4.2, 2.1, 3.3]} color="#f0d893" />
-      <mesh position={[4.6, 2.45, 0.5]} rotation={[0, 0, 0]} castShadow>
+      <mesh position={[0, 0.09, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[6.72, 7.05, 32]} />
+        <meshStandardMaterial color="#d7c58c" roughness={1} />
+      </mesh>
+      <SwimmingDuck radius={3.7} speed={0.34} phase={0} />
+      <SwimmingDuck radius={2.6} speed={-0.27} phase={2.4} scale={0.82} />
+      <Box position={[6.6, 1.05, 0.5]} scale={[4.2, 2.1, 3.3]} color="#f0d893" />
+      <mesh position={[6.6, 2.45, 0.5]} rotation={[0, 0, 0]} castShadow>
         <coneGeometry args={[3.2, 1.4, 4]} />
         <meshStandardMaterial color={red} flatShading />
       </mesh>
-      <Tree position={[-3.7, 0, -2.6]} scale={0.9} />
-      <Tree position={[-4.5, 0, 2.2]} scale={0.72} />
+      <Tree position={[3, 0, 9]} scale={0.9} />
+      <Tree position={[10, 0, 5]} scale={0.72} />
     </group>
   );
 }
@@ -666,10 +758,10 @@ export const STREET_STALLS: Array<{
   position: [number, number, number];
   rotation: number;
 }> = [
-  { kind: "tea", label: "ES TEH SOLO", position: [0, 0, 15.5], rotation: Math.PI },
+  { kind: "tea", label: "ES TEH SOLO", position: [-5, 0, -29], rotation: 0 },
   { kind: "angkringan", label: "ANGKRINGAN", position: [5, 0, 5], rotation: 0 },
-  { kind: "coffee", label: "ES KOPI", position: [25, 0, 15.5], rotation: Math.PI },
-  { kind: "batik", label: "BATIK SOLO", position: [-34, 0, -18], rotation: Math.PI },
+  { kind: "coffee", label: "ES KOPI", position: [23.2, 0, 28], rotation: 0 },
+  { kind: "batik", label: "BATIK SOLO", position: [-5, 0, -35], rotation: 0 },
 ];
 
 function StallSign({ label, color, back = false }: { label: string; color: string; back?: boolean }) {
@@ -696,7 +788,7 @@ function StallSign({ label, color, back = false }: { label: string; color: strin
   }, [color, label]);
 
   return (
-    <mesh position={[0, 2.8, back ? -0.91 : 0.91]} rotation={[0, back ? Math.PI : 0, 0]} castShadow>
+    <mesh position={[0, 2.82, back ? -1.72 : 1.72]} rotation={[0, back ? Math.PI : 0, 0]} castShadow>
       <planeGeometry args={[2.8, 0.7]} />
       <meshBasicMaterial map={texture} toneMapped={false} />
     </mesh>
@@ -787,6 +879,291 @@ export function CampusStreetStalls() {
   );
 }
 
+function PtiCreativeLogo() {
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 420;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.fillStyle = "#f0f1ef";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#116bd2";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.font = "900 250px Arial, sans-serif";
+      context.fillText("PTI", 555, 160);
+
+      context.fillStyle = "#ffd51f";
+      context.beginPath();
+      context.arc(830, 105, 88, 0, Math.PI * 2);
+      context.fill();
+
+      context.fillStyle = "#116bd2";
+      context.beginPath();
+      context.moveTo(850, 95);
+      context.lineTo(948, 168);
+      context.lineTo(900, 176);
+      context.lineTo(924, 224);
+      context.lineTo(892, 240);
+      context.lineTo(868, 190);
+      context.lineTo(832, 224);
+      context.closePath();
+      context.fill();
+
+      context.font = "800 104px Arial, sans-serif";
+      context.letterSpacing = "26px";
+      context.fillText("KREATIF", 580, 335);
+    }
+    const logoTexture = new THREE.CanvasTexture(canvas);
+    logoTexture.colorSpace = THREE.SRGBColorSpace;
+    logoTexture.anisotropy = 4;
+    return logoTexture;
+  }, []);
+
+  return (
+    <mesh position={[0.62, 2.03, 1.94]} castShadow>
+      <planeGeometry args={[3.2, 1.12]} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function PtiOffice() {
+  return (
+    <group>
+      <Box position={[0, 1.45, 0]} scale={[5.2, 2.9, 3.6]} color="#ece8dd" radius={0.08} />
+      <Box position={[0, 3.04, 0]} scale={[5.55, 0.32, 3.95]} color="#176bc1" radius={0.06} />
+      <Box position={[-1.72, 1.1, 1.89]} scale={[1.15, 1.75, 0.18]} color="#173456" radius={0.035} />
+      <Box position={[-1.72, 2.35, 1.93]} scale={[1.45, 0.32, 0.16]} color="#f3c84b" radius={0.025} />
+      <PtiCreativeLogo />
+      {[-1.72, 1.72].map((x) => (
+        <Box key={`office-side-window-${x}`} position={[x, 1.15, -1.86]} scale={[1.18, 1.15, 0.16]} color="#8fc4cf" radius={0.035} />
+      ))}
+      <Box position={[0, 0.18, 2.24]} scale={[5.8, 0.25, 0.85]} color="#d3c9b7" radius={0.04} />
+    </group>
+  );
+}
+
+function GriyaMahasiswaSign() {
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = 320;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#9d2738";
+      context.textAlign = "left";
+      context.textBaseline = "middle";
+      context.font = "900 132px Arial, sans-serif";
+      context.fillText("GM", 28, 93);
+      context.font = "800 102px Arial, sans-serif";
+      context.fillText("GRIYA MAHASISWA", 28, 230, 1120);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 4;
+    return texture;
+  }, []);
+  return (
+    <mesh position={[1.1, 3.46, 2.53]} castShadow>
+      <planeGeometry args={[5.5, 1.45]} />
+      <meshBasicMaterial map={texture} transparent toneMapped={false} />
+    </mesh>
+  );
+}
+
+function GriyaMahasiswa() {
+  const floors = [1.6, 2.75, 3.9, 5.05];
+  return (
+    <group>
+      <Box position={[0, 3.25, 0]} scale={[8.6, 6.5, 4.8]} color="#e6e5df" radius={0.08} />
+      <Box position={[1.35, 5.72, 0]} scale={[5.9, 1.15, 4.95]} color="#68727e" radius={0.05} />
+      {floors.map((y) => (
+        <Box key={y} position={[1.28, y, 2.46]} scale={[5.55, 0.58, 0.16]} color="#466a78" radius={0.025} />
+      ))}
+      {[-0.9, 0.2, 1.3, 2.4, 3.5].map((x) => (
+        <Box key={`gm-window-frame-${x}`} position={[x, 3.1, 2.56]} scale={[0.08, 4.7, 0.12]} color="#d9dcd8" radius={0.015} />
+      ))}
+
+      <Box position={[-3.05, 3.22, 2.52]} scale={[2.15, 5.9, 0.18]} color="#263a46" radius={0.025} />
+      {[1.15, 2.25, 3.35, 4.45, 5.55].flatMap((y, row) =>
+        [-3.72, -3.28, -2.84, -2.4].map((x, column) => (
+          <group key={`gm-lattice-${row}-${column}`} position={[x, y, 2.67]}>
+            <mesh rotation={[0, 0, Math.PI / 4]} castShadow>
+              <boxGeometry args={[0.12, 0.86, 0.1]} />
+              <meshStandardMaterial color="#f1f0e9" roughness={0.78} />
+            </mesh>
+            <mesh rotation={[0, 0, -Math.PI / 4]} castShadow>
+              <boxGeometry args={[0.12, 0.86, 0.1]} />
+              <meshStandardMaterial color="#f1f0e9" roughness={0.78} />
+            </mesh>
+          </group>
+        )),
+      )}
+
+      <Box position={[0.85, 1.72, 3.08]} scale={[5.8, 0.3, 1.35]} color="#cdd1d0" radius={0.045} />
+      {[-1.65, 2.7].map((x) => (
+        <mesh key={`gm-column-${x}`} position={[x, 0.83, 3.22]} castShadow>
+          <cylinderGeometry args={[0.13, 0.15, 1.66, 10]} />
+          <meshStandardMaterial color="#7f898d" flatShading roughness={0.65} />
+        </mesh>
+      ))}
+      <Box position={[0.8, 0.68, 2.53]} scale={[2.25, 1.35, 0.18]} color="#18354a" radius={0.025} />
+      <GriyaMahasiswaSign />
+      <Box position={[0, 6.62, 0]} scale={[8.9, 0.28, 5.05]} color="#525d68" radius={0.05} />
+    </group>
+  );
+}
+
+function MedicalCenterSign() {
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1024;
+    canvas.height = 320;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.fillStyle = "#f7f6ef";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#23886f";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.font = "900 150px Arial, sans-serif";
+      context.fillText("MMC", canvas.width / 2, 115);
+      context.font = "700 48px Arial, sans-serif";
+      context.fillText("MUHAMMADIYAH MEDICAL CENTRE", canvas.width / 2, 242, 920);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 4;
+    return texture;
+  }, []);
+
+  return (
+    <mesh position={[0.55, 2.05, 1.94]} castShadow>
+      <planeGeometry args={[3.25, 1.02]} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function MedicalCenter() {
+  return (
+    <group>
+      <Box position={[0, 1.42, 0]} scale={[5.2, 2.84, 3.6]} color="#f0ede3" radius={0.08} />
+      <Box position={[0, 3.02, 0]} scale={[5.55, 0.34, 3.95]} color="#23886f" radius={0.055} />
+      <Box position={[-1.75, 1.08, 1.9]} scale={[1.12, 1.75, 0.2]} color="#24556a" radius={0.035} />
+      <MedicalCenterSign />
+      {[-1.45, 0, 1.45].map((x) => (
+        <Box key={`mmc-window-${x}`} position={[x, 1.02, -1.86]} scale={[0.95, 1.12, 0.16]} color="#8fc8cf" radius={0.03} />
+      ))}
+      <group position={[-1.75, 2.38, 2.03]}>
+        <Box position={[0, 0, 0]} scale={[0.22, 0.72, 0.12]} color="#e34b48" radius={0.02} />
+        <Box position={[0, 0, 0.01]} scale={[0.72, 0.22, 0.14]} color="#e34b48" radius={0.02} />
+      </group>
+      <Box position={[0, 0.16, 2.25]} scale={[5.8, 0.25, 0.85]} color="#d2cbbb" radius={0.04} />
+    </group>
+  );
+}
+
+function HospitalSign() {
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1024;
+    canvas.height = 256;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.fillStyle = "#f2f3ef";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.font = "700 72px Arial, sans-serif";
+      context.fillStyle = "#245a61";
+      context.fillText("RS UMS AR FACHRUDDIN", canvas.width / 2, 82, 920);
+      context.font = "900 112px Arial, sans-serif";
+      context.fillStyle = "#c83d37";
+      context.fillText("IGD", canvas.width / 2, 176);
+    }
+    const signTexture = new THREE.CanvasTexture(canvas);
+    signTexture.colorSpace = THREE.SRGBColorSpace;
+    signTexture.anisotropy = 4;
+    return signTexture;
+  }, []);
+
+  return (
+    <mesh position={[2.45, 1.12, 4.18]} castShadow>
+      <planeGeometry args={[3.45, 0.86]} />
+      <meshBasicMaterial map={texture} toneMapped={false} />
+    </mesh>
+  );
+}
+
+function Hospital() {
+  const facadeColumns = [-3.55, -2.7, -1.85, -1, -0.15, 0.7, 1.55, 2.4, 3.25];
+  const facadeRows = [1.55, 2.35, 3.15, 3.95, 4.75, 5.55];
+  const braceColor = "#969c9d";
+
+  return (
+    <group>
+      <Box position={[0, 3.45, 0]} scale={[9.5, 6.9, 5.7]} color="#d7dbd8" radius={0.08} />
+      <Box position={[0, 3.55, 2.91]} scale={[8.25, 5.65, 0.16]} color="#68aeb2" radius={0.025} />
+
+      {facadeColumns.map((x) => (
+        <Box key={`hospital-column-${x}`} position={[x, 3.55, 3.04]} scale={[0.1, 5.55, 0.12]} color="#dce4e1" radius={0.015} />
+      ))}
+      {facadeRows.map((y) => (
+        <Box key={`hospital-row-${y}`} position={[0, y, 3.04]} scale={[8.15, 0.1, 0.12]} color="#dce4e1" radius={0.015} />
+      ))}
+
+      <mesh position={[-2.45, 4.62, 3.2]} rotation={[0, 0, -0.53]} castShadow>
+        <boxGeometry args={[5.9, 0.72, 0.3]} />
+        <meshStandardMaterial color={braceColor} roughness={0.76} />
+      </mesh>
+      <mesh position={[2.28, 4.56, 3.21]} rotation={[0, 0, 0.52]} castShadow>
+        <boxGeometry args={[5.7, 0.72, 0.3]} />
+        <meshStandardMaterial color={braceColor} roughness={0.76} />
+      </mesh>
+      <mesh position={[-0.75, 2.83, 3.22]} rotation={[0, 0, -0.58]} castShadow>
+        <boxGeometry args={[5.75, 0.72, 0.3]} />
+        <meshStandardMaterial color={braceColor} roughness={0.76} />
+      </mesh>
+      <mesh position={[3.05, 2.65, 3.22]} rotation={[0, 0, 0.63]} castShadow>
+        <boxGeometry args={[3.9, 0.72, 0.3]} />
+        <meshStandardMaterial color={braceColor} roughness={0.76} />
+      </mesh>
+
+      <mesh position={[-5.05, 3.35, -0.15]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.72, 0.86, 6.7, 14]} />
+        <meshStandardMaterial color="#e6e7e2" flatShading roughness={0.82} />
+      </mesh>
+      {[1.5, 2.35, 3.2, 4.05, 4.9, 5.75].map((y) => (
+        <Box key={`hospital-side-window-${y}`} position={[4.81, y, 0]} scale={[0.12, 0.42, 3.9]} color="#76aeb1" radius={0.02} />
+      ))}
+
+      <mesh position={[0, 7.05, -1.32]} rotation={[0.08, 0, 0]} castShadow>
+        <boxGeometry args={[9.65, 0.32, 3.05]} />
+        <meshStandardMaterial color="#eef0ed" roughness={0.74} />
+      </mesh>
+      <mesh position={[0, 7.05, 1.32]} rotation={[-0.08, 0, 0]} castShadow>
+        <boxGeometry args={[9.65, 0.32, 3.05]} />
+        <meshStandardMaterial color="#eef0ed" roughness={0.74} />
+      </mesh>
+
+      <Box position={[2.45, 0.82, 3.7]} scale={[3.65, 0.42, 1.7]} color="#f1f2ef" radius={0.05} />
+      {[-1.25, 1.25].map((x) => (
+        <Box key={`hospital-canopy-${x}`} position={[2.45 + x, 0.42, 4.18]} scale={[0.12, 0.84, 0.12]} color="#8e9695" radius={0.02} />
+      ))}
+      <HospitalSign />
+
+      <group position={[-3.62, 5.82, 3.26]}>
+        <Box position={[0, 0, 0]} scale={[0.34, 1.3, 0.16]} color="#cf3e3a" radius={0.025} />
+        <Box position={[0, 0, 0.02]} scale={[1.3, 0.34, 0.18]} color="#cf3e3a" radius={0.025} />
+      </group>
+    </group>
+  );
+}
+
 export function CampusBuilding({ location }: { location: CampusLocation }) {
   let building: React.ReactNode;
 
@@ -801,13 +1178,30 @@ export function CampusBuilding({ location }: { location: CampusLocation }) {
       building = <AcademicBuilding accent={yellow} floors={4} />;
       break;
     case "academic-red":
-      building = <AcademicBuilding accent={red} floors={3} />;
+      building = (
+        <>
+          <AcademicBuilding accent={red} floors={3} />
+          <ILoveFkipLandmark />
+        </>
+      );
+      break;
+    case "pti-office":
+      building = <PtiOffice />;
+      break;
+    case "medical-center":
+      building = <MedicalCenter />;
+      break;
+    case "student-center":
+      building = <GriyaMahasiswa />;
       break;
     case "siti-walidah":
       building = <SitiWalidah />;
       break;
     case "edutorium":
       building = <Edutorium />;
+      break;
+    case "hospital":
+      building = <Hospital />;
       break;
     case "mosque-modern":
       building = <Mosque modern />;
@@ -836,16 +1230,80 @@ export function CampusBuilding({ location }: { location: CampusLocation }) {
   );
 }
 
+function SoccerGoal({ z, rotationY = 0 }: { z: number; rotationY?: number }) {
+  return (
+    <group position={[0, 0, z]} rotation={[0, rotationY, 0]}>
+      {[-1.18, 1.18].map((x) => (
+        <Box key={x} position={[x, 0.62, 0]} scale={[0.1, 1.24, 0.1]} color="#f6f5e9" radius={0.015} />
+      ))}
+      <Box position={[0, 1.22, 0]} scale={[2.46, 0.1, 0.1]} color="#f6f5e9" radius={0.015} />
+      {[-0.8, 0, 0.8].map((x) => (
+        <mesh key={`goal-net-${x}`} position={[x, 0.62, -0.34]}>
+          <boxGeometry args={[0.025, 1.12, 0.72]} />
+          <meshStandardMaterial color="#dce5df" transparent opacity={0.5} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function BasketballHoop({ z, rotationY = 0 }: { z: number; rotationY?: number }) {
+  return (
+    <group position={[0, 0, z]} rotation={[0, rotationY, 0]}>
+      <Box position={[0, 1.35, -0.46]} scale={[0.13, 2.7, 0.13]} color="#3c4c52" radius={0.02} />
+      <Box position={[0, 2.46, -0.08]} scale={[1.28, 0.78, 0.1]} color="#f3f1df" radius={0.025} />
+      <mesh position={[0, 2.14, 0.35]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <torusGeometry args={[0.32, 0.045, 8, 20]} />
+        <meshStandardMaterial color="#e66a35" roughness={0.72} />
+      </mesh>
+    </group>
+  );
+}
+
+export function CampusSportsCourts() {
+  const soccerX = 3.8;
+  const basketX = 12;
+  const z = -12;
+  return (
+    <group>
+      <group position={[soccerX, worldSurfaceY(soccerX, z) + 0.08, z]} rotation={worldSurfaceTilt(soccerX, z)}>
+        <Box position={[0, 0.04, 0]} scale={[7.4, 0.12, 11]} color="#4a9a67" radius={0.12} />
+        <mesh position={[0, 0.115, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.05, 1.12, 32]} />
+          <meshBasicMaterial color="#f4f1d8" side={THREE.DoubleSide} />
+        </mesh>
+        <Box position={[0, 0.115, 0]} scale={[0.07, 0.025, 10.55]} color="#f4f1d8" radius={0.005} />
+        {[-3.48, 3.48].map((x) => <Box key={`soccer-side-${x}`} position={[x, 0.115, 0]} scale={[0.07, 0.025, 10.55]} color="#f4f1d8" radius={0.005} />)}
+        {[-5.25, 5.25].map((goalZ) => <Box key={`soccer-end-${goalZ}`} position={[0, 0.115, goalZ]} scale={[7.02, 0.025, 0.07]} color="#f4f1d8" radius={0.005} />)}
+        <SoccerGoal z={-5.18} />
+        <SoccerGoal z={5.18} rotationY={Math.PI} />
+        <mesh position={[0.3, 0.28, 1.2]} castShadow><sphereGeometry args={[0.2, 10, 7]} /><meshStandardMaterial color="#f5f1dc" flatShading /></mesh>
+      </group>
+
+      <group position={[basketX, worldSurfaceY(basketX, z) + 0.08, z]} rotation={worldSurfaceTilt(basketX, z)}>
+        <Box position={[0, 0.04, 0]} scale={[7, 0.12, 11]} color="#3c83b8" radius={0.12} />
+        <Box position={[0, 0.115, 0]} scale={[0.07, 0.025, 10.55]} color="#f3cf55" radius={0.005} />
+        {[-3.28, 3.28].map((x) => <Box key={`basket-side-${x}`} position={[x, 0.115, 0]} scale={[0.07, 0.025, 10.55]} color="#f3cf55" radius={0.005} />)}
+        {[-5.25, 5.25].map((endZ) => <Box key={`basket-end-${endZ}`} position={[0, 0.115, endZ]} scale={[6.62, 0.025, 0.07]} color="#f3cf55" radius={0.005} />)}
+        <mesh position={[0, 0.116, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[1.02, 1.09, 32]} /><meshBasicMaterial color="#f3cf55" side={THREE.DoubleSide} /></mesh>
+        <BasketballHoop z={-4.72} />
+        <BasketballHoop z={4.72} rotationY={Math.PI} />
+        <mesh position={[-0.8, 0.27, -0.6]} castShadow><sphereGeometry args={[0.2, 10, 7]} /><meshStandardMaterial color="#dc7337" flatShading /></mesh>
+      </group>
+    </group>
+  );
+}
+
 export function CampusTrees() {
   const trees: Array<[number, number, number, number]> = [
     // Entrance boulevard along West Road (x = -19, road width 5.5 => edges at -21.75 and -16.25)
     [-24.5, 0, 36, 0.9],
-    [-24.5, 0, 28, 0.85],
+    [-28, 0, 29, 0.85],
     [-24.5, 0, 20, 0.9],
     [-24.5, 0, 14.5, 0.8],
     [-13.5, 0, 36, 0.9],
     [-13.5, 0, 28, 0.85],
-    [-13.5, 0, 20, 0.9],
+    [-11, 0, 24, 0.9],
     [-13.5, 0, 14.5, 0.8],
 
     // Main cross-road roadside (road at z = 10, width 6 => edges at z = 7 and z = 13)
@@ -853,16 +1311,16 @@ export function CampusTrees() {
     [-39, 0, 5, 0.9],
     [-32, 0, 5, 0.85],
     [-24.5, 0, 5, 0.8],
-    [-13.5, 0, 5, 0.85],
-    [-9, 0, 5, 0.9],
-    [9, 0, 5, 0.85],
-    [13.5, 0, 5, 0.8],
+    [-16, 0, 4, 0.85],
+    [7, 0, 5, 0.9],
+    [3, 0, 3, 0.85],
+    [15, 0, 3, 0.8],
     [24.5, 0, 5, 0.85],
     [33, 0, 5, 0.8],
     [40, 0, 5, 0.9],
     // North roadside (z >= 14.8)
     [-38, 0, 15, 0.85],
-    [-9, 0, 15.5, 0.88],
+    [-4, 0, 20, 0.88],
     [4, 0, 15.5, 0.85],
     [34, 0, 15.5, 0.85],
 
@@ -881,25 +1339,25 @@ export function CampusTrees() {
 
     // Central park & mosque courtyard
     [-2, 0, 25, 0.85],
-    [-2, 0, -2, 0.8],
-    [0, 0, -12, 0.85],
-    [4, 0, -16, 0.88],
+    [1, 0, -4, 0.8],
+    [-3, 0, -7, 0.85],
+    [-4, 0, -16, 0.88],
     [2, 0, -28, 0.85],
 
     // Kampus 2 sector (Siti Walidah, Library, Lake, Masjid Sudalmiyah)
     [13.5, 0, 28, 0.85],
-    [2, 0, 32, 0.8],
-    [13.5, 0, 33, 0.85],
-    [24.5, 0, 31, 0.85],
-    [36, 0, 28, 0.88],
+    [1, 0, 27, 0.8],
+    [32, 0, 36, 0.85],
+    [29, 0, 29, 0.85],
+    [40, 0, 27, 0.88],
     [36, 0, 14, 0.8],
-    [24.5, 0, -6, 0.82],
+    [35, 0, -10, 0.82],
     [34, 0, -2, 0.85],
     [41, 0, -12, 0.9],
 
     // Edutorium & north sector
-    [7, 0, -34, 0.92],
-    [13.5, 0, -18, 0.82],
+    [-7, 0, -40, 0.92],
+    [14, 0, -28, 0.82],
     [13.5, 0, -32, 0.85],
     [34, 0, -20, 0.85],
     [38, 0, -34, 0.86],
@@ -912,7 +1370,7 @@ export function CampusTrees() {
     [8, 0, 38, 0.85],
     [26, 0, 38, 0.8],
     [-18, 0, -36, 0.85],
-    [-2, 0, -36, 0.85],
+    [-12, 0, -35, 0.85],
   ];
   return (
     <group>

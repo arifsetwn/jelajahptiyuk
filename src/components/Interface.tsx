@@ -1,5 +1,6 @@
 import {
   ArrowCounterClockwise,
+  ArrowsOutLineVertical,
   ArrowSquareOut,
   Buildings,
   Camera,
@@ -58,6 +59,8 @@ function StartScreen() {
   const start = useExperience((state) => state.start);
   const ready = useExperience((state) => state.assetsLoaded);
   const statusText = ready ? "Kampus 3D siap!" : "Menyiapkan kampus 3D...";
+  const ptiTotal = locations.filter((location) => location.category === "pti_fkip").length;
+  const umsTotal = locations.filter((location) => location.category === "landmark_ums").length;
 
   return (
     <section className="start-screen" aria-labelledby="welcome-title">
@@ -104,9 +107,9 @@ function StartScreen() {
           </div>
         </div>
         <div className="start-meta" aria-label="Ringkasan pengalaman">
-          <span><strong>11</strong> lokasi</span>
-          <span><strong>4</strong> ruang PTI</span>
-          <span><strong>7</strong> ikon UMS</span>
+          <span><strong>{locations.length}</strong> lokasi</span>
+          <span><strong>{ptiTotal}</strong> ruang PTI</span>
+          <span><strong>{umsTotal}</strong> ikon UMS</span>
         </div>
       </div>
     </section>
@@ -114,13 +117,16 @@ function StartScreen() {
 }
 
 function Header() {
+  const [cameraSettingsOpen, setCameraSettingsOpen] = useState(false);
   const soundEnabled = useExperience((state) => state.soundEnabled);
   const quality = useExperience((state) => state.quality);
   const cameraMode = useExperience((state) => state.cameraMode);
+  const cameraHeight = useExperience((state) => state.cameraHeight);
   const mapOpen = useExperience((state) => state.mapOpen);
   const toggleSound = useExperience((state) => state.toggleSound);
   const toggleQuality = useExperience((state) => state.toggleQuality);
   const toggleCamera = useExperience((state) => state.toggleCamera);
+  const setCameraHeight = useExperience((state) => state.setCameraHeight);
   const setMapOpen = useExperience((state) => state.setMapOpen);
   const setHelpOpen = useExperience((state) => state.setHelpOpen);
 
@@ -140,6 +146,35 @@ function Header() {
         <IconButton label={cameraMode === "follow" ? "Gunakan kamera overview" : "Ikuti karakter"} active={cameraMode === "overview"} onClick={toggleCamera}>
           <Camera size={21} />
         </IconButton>
+        <div className="camera-height-control">
+          <IconButton
+            label="Atur ketinggian kamera"
+            active={cameraSettingsOpen}
+            onClick={() => setCameraSettingsOpen((open) => !open)}
+          >
+            <ArrowsOutLineVertical size={21} />
+          </IconButton>
+          {cameraSettingsOpen && (
+            <div className="camera-height-panel">
+              <div className="camera-height-heading">
+                <span>Ketinggian kamera</span>
+                <strong>{cameraHeight}</strong>
+              </div>
+              <input
+                aria-label="Ketinggian kamera"
+                type="range"
+                min="12"
+                max="30"
+                step="1"
+                value={cameraHeight}
+                onChange={(event) => setCameraHeight(Number(event.target.value))}
+              />
+              <div className="camera-height-scale" aria-hidden="true">
+                <span>Rendah</span><span>Normal</span><span>Tinggi</span>
+              </div>
+            </div>
+          )}
+        </div>
         <IconButton label="Buka peta" active={mapOpen} onClick={() => setMapOpen(true)}>
           <MapTrifold size={21} />
         </IconButton>
@@ -155,13 +190,15 @@ function ProgressPanel() {
   const visited = useExperience((state) => state.visitedLocationIds);
   const ptiCount = locations.filter((location) => location.category === "pti_fkip" && visited.includes(location.id)).length;
   const umsCount = locations.filter((location) => location.category === "landmark_ums" && visited.includes(location.id)).length;
+  const ptiTotal = locations.filter((location) => location.category === "pti_fkip").length;
+  const umsTotal = locations.filter((location) => location.category === "landmark_ums").length;
 
   return (
     <aside className="progress-panel" aria-label="Progres jelajah">
-      <div className="progress-number"><strong>{visited.length}</strong><span>dari 11 lokasi</span></div>
+      <div className="progress-number"><strong>{visited.length}</strong><span>dari {locations.length} lokasi</span></div>
       <div className="progress-groups">
-        <span>Ruang PTI <strong>{ptiCount}/4</strong></span>
-        <span>Ikon UMS <strong>{umsCount}/7</strong></span>
+        <span>Ruang PTI <strong>{ptiCount}/{ptiTotal}</strong></span>
+        <span>Ikon UMS <strong>{umsCount}/{umsTotal}</strong></span>
       </div>
     </aside>
   );

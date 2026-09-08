@@ -147,6 +147,60 @@ a:focus-visible,
   gap: 8px;
 }
 
+.camera-height-control {
+  position: relative;
+}
+
+.camera-height-panel {
+  position: absolute;
+  top: 58px;
+  right: 0;
+  width: 250px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  color: #fff;
+  background: rgba(10, 27, 50, 0.94);
+  box-shadow: 0 16px 38px rgba(4, 15, 32, 0.28);
+  backdrop-filter: blur(14px);
+}
+
+.camera-height-heading,
+.camera-height-scale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.camera-height-heading {
+  margin-bottom: 13px;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.camera-height-heading strong {
+  min-width: 31px;
+  padding: 3px 7px;
+  border-radius: 7px;
+  color: var(--ink);
+  background: var(--accent);
+  text-align: center;
+}
+
+.camera-height-panel input[type="range"] {
+  width: 100%;
+  height: 6px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.camera-height-scale {
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.67rem;
+}
+
 .icon-button,
 .dialog-close {
   display: grid;
@@ -590,9 +644,11 @@ kbd {
 /* ── Photo Carousel ─────────────────────────────────── */
 .location-carousel {
   position: relative;
-  height: 280px;
+  height: 100%;
+  min-height: 300px;
   overflow: hidden;
   background: #111;
+  align-self: stretch;
   flex-shrink: 0;
 }
 

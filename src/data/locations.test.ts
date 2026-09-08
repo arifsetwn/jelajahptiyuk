@@ -2,23 +2,23 @@ import { describe, expect, it } from "vitest";
 import { getLocation, locations } from "./locations";
 
 describe("campus locations", () => {
-  it("contains eleven uniquely identified locations", () => {
-    expect(locations).toHaveLength(11);
-    expect(new Set(locations.map((location) => location.id)).size).toBe(11);
+  it("contains fifteen uniquely identified locations", () => {
+    expect(locations).toHaveLength(15);
+    expect(new Set(locations.map((location) => location.id)).size).toBe(15);
     expect(locations.map((location) => location.id).sort()).toEqual([
-      "L01", "L02", "L03", "L04", "L05", "L06", "L07", "L08", "L09", "L10", "L11",
+      "L01", "L02", "L03", "L04", "L05", "L06", "L07", "L08", "L09", "L10", "L11", "L12", "L13", "L14", "L15",
     ]);
   });
 
-  it("contains four PTI locations and seven UMS landmarks", () => {
-    expect(locations.filter((location) => location.category === "pti_fkip")).toHaveLength(4);
-    expect(locations.filter((location) => location.category === "landmark_ums")).toHaveLength(7);
+  it("contains five PTI locations and ten UMS landmarks", () => {
+    expect(locations.filter((location) => location.category === "pti_fkip")).toHaveLength(5);
+    expect(locations.filter((location) => location.category === "landmark_ums")).toHaveLength(10);
   });
 
   it("groups locations into the three required campus areas", () => {
-    expect(locations.filter((location) => location.campusArea === "kampus_1")).toHaveLength(6);
-    expect(locations.filter((location) => location.campusArea === "kampus_2")).toHaveLength(4);
-    expect(locations.filter((location) => location.campusArea === "edutorium")).toHaveLength(1);
+    expect(locations.filter((location) => location.campusArea === "kampus_1")).toHaveLength(8);
+    expect(locations.filter((location) => location.campusArea === "kampus_2")).toHaveLength(5);
+    expect(locations.filter((location) => location.campusArea === "edutorium")).toHaveLength(2);
   });
 
   it("resolves a location by id and rejects an unknown id", () => {

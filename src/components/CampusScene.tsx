@@ -1,13 +1,15 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
+import { CuboidCollider, CylinderCollider, Physics, RigidBody } from "@react-three/rapier";
 import { Suspense, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { locations } from "../data/locations";
 import { useExperience } from "../store/useExperience";
 import { WORLD_CENTER_Y, WORLD_RADIUS, WORLD_VERTICAL_RADIUS, worldSurfaceTilt, worldSurfaceY } from "../worldGeometry";
 import { CAMPUS_ROADS, createCurvedRoadGeometry, createCurvedRoadMarkings } from "./curvedRoad";
-import { CampusBuilding, CampusOneGate, CampusStreetStalls, CampusTrees, STREET_STALLS } from "./CampusBuildings";
+import { CampusBuilding, CampusOneGate, CampusSportsCourts, CampusStreetStalls, CampusTrees, STREET_STALLS } from "./CampusBuildings";
+import { CampusBusStop, CampusLife } from "./CampusLife";
+import { CampusRiver } from "./CampusRiver";
 import { Player } from "./Player";
 import { SceneReady } from "./SceneReady";
 
@@ -114,9 +116,23 @@ function World() {
         </mesh>
 
         <CampusRoads />
+        <CampusRiver />
 
-        <CuboidCollider args={[1.18, 1.55, 1.3]} position={[-23.45, worldSurfaceY(-23.45, 30.35) + 1.55, 30.35]} />
-        <CuboidCollider args={[1.18, 1.55, 1.3]} position={[-14.55, worldSurfaceY(-14.55, 30.35) + 1.55, 30.35]} />
+        <CuboidCollider args={[1.18, 1.55, 1.3]} position={[-23.45, worldSurfaceY(-23.45, 26.85) + 1.55, 26.85]} />
+        <CuboidCollider args={[1.18, 1.55, 1.3]} position={[-14.55, worldSurfaceY(-14.55, 26.85) + 1.55, 26.85]} />
+        <CuboidCollider args={[1.75, 1.2, 0.78]} position={[0, worldSurfaceY(0, 14.5) + 1.2, 14.5]} rotation={worldSurfaceTilt(0, 14.5)} />
+
+        <CuboidCollider
+          args={[3.8, 0.9, 0.35]}
+          position={[-10.28, worldSurfaceY(-10.28, -14.51) + 0.9, -14.51]}
+          rotation={[0, -0.08, 0]}
+        />
+
+        <CylinderCollider
+          args={[0.9, 6.85]}
+          position={[28, worldSurfaceY(28, 20) + 0.72, 20]}
+          rotation={worldSurfaceTilt(28, 20)}
+        />
 
         {STREET_STALLS.map((stall) => {
           const [x, , z] = stall.position;
@@ -134,13 +150,17 @@ function World() {
           const wide = location.kind === "edutorium" || location.kind === "siti-walidah";
           const isSitiWalidah = location.kind === "siti-walidah";
           const isEdutorium = location.kind === "edutorium";
+          const isHospital = location.kind === "hospital";
+          const isPtiOffice = location.kind === "pti-office";
+          const isMedicalCenter = location.kind === "medical-center";
+          const isStudentCenter = location.kind === "student-center";
           return (
             <CuboidCollider
               key={`collider-${location.id}`}
-              args={[isSitiWalidah ? 6 : isEdutorium ? 6.6 : wide ? 4.7 : 3.5, isSitiWalidah ? 3.7 : isEdutorium ? 3.1 : 2.6, isEdutorium ? 5.1 : wide ? 3.25 : 2.3]}
+              args={[isSitiWalidah ? 6 : isEdutorium ? 6.6 : isHospital ? 4.8 : isStudentCenter ? 4.3 : isPtiOffice || isMedicalCenter ? 2.6 : wide ? 4.7 : 3.5, isSitiWalidah ? 3.7 : isEdutorium ? 3.1 : isHospital ? 3.6 : isStudentCenter ? 3.35 : isPtiOffice || isMedicalCenter ? 1.65 : 2.6, isSitiWalidah ? 5.9 : isEdutorium ? 5.1 : isHospital ? 3 : isStudentCenter ? 2.5 : isPtiOffice || isMedicalCenter ? 1.9 : wide ? 3.25 : 2.3]}
               position={[
                 location.position[0],
-                worldSurfaceY(location.position[0], location.position[2]) + (isSitiWalidah ? 3.7 : isEdutorium ? 3.1 : 2.2),
+                worldSurfaceY(location.position[0], location.position[2]) + (isSitiWalidah ? 3.7 : isEdutorium ? 3.1 : isHospital ? 3.6 : isStudentCenter ? 3.35 : isPtiOffice || isMedicalCenter ? 1.65 : 2.2),
                 location.position[2],
               ]}
               rotation={[0, location.rotation ?? 0, 0]}
@@ -154,7 +174,10 @@ function World() {
       ))}
       <CampusOneGate />
       <CampusStreetStalls />
+      <CampusSportsCourts />
       <CampusTrees />
+      <CampusBusStop />
+      <CampusLife />
       <CampusAreaLabel position={[-37, 0.3, 28]} title="Kampus 1" />
       <CampusAreaLabel position={[20, 0.3, 32]} title="Kampus 2" />
       <CampusAreaLabel position={[24, 0.3, -37]} title="Edutorium" />
@@ -165,7 +188,7 @@ function World() {
           position={location.position}
           accent={location.accent}
           label={location.mapLabel}
-          offsetZ={location.kind === "edutorium" ? 7.8 : 4.2}
+          offsetZ={location.kind === "edutorium" ? 7.8 : location.kind === "lakeside" ? 8 : location.kind === "siti-walidah" ? 9.4 : location.kind === "hospital" ? 4.7 : location.kind === "pti-office" || location.kind === "medical-center" ? 3 : 4.2}
         />
       ))}
       <Player />

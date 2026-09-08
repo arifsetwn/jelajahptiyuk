@@ -125,7 +125,7 @@ export function Player() {
     let nearestId: string | null = null;
     let nearestDistance = 5.5;
     for (const location of locations) {
-      const interactionZ = location.position[2] + (location.kind === "edutorium" ? 7.8 : 0);
+      const interactionZ = location.position[2] + (location.kind === "edutorium" ? 7.8 : location.kind === "lakeside" ? 8 : location.kind === "siti-walidah" ? 9.4 : location.kind === "hospital" ? 4.7 : location.kind === "pti-office" ? 3 : location.kind === "medical-center" ? 3 : 0);
       const distance = Math.hypot(position.x - location.position[0], position.z - interactionZ);
       if (distance < nearestDistance) {
         nearestDistance = distance;
@@ -143,9 +143,7 @@ export function Player() {
     } else {
       const framingTallLandmark = nearestId === SITI_WALIDAH_ID;
       const narrowViewport = size.width / size.height < 0.82;
-      const heightOffset = narrowViewport
-        ? (framingTallLandmark ? 25 : 21)
-        : (framingTallLandmark ? 22 : 18);
+      const heightOffset = state.cameraHeight + (narrowViewport ? 3 : 0) + (framingTallLandmark ? 4 : 0);
       const distanceZ = narrowViewport
         ? (framingTallLandmark ? 25 : 21)
         : (framingTallLandmark ? 21 : 17);
