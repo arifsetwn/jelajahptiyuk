@@ -195,10 +195,17 @@ function LocationModal() {
 
   return (
     <Dialog title={location.title} onClose={closeLocation} className="location-dialog">
-      <div className="location-art" style={{ "--location-accent": location.accent } as React.CSSProperties}>
-        <Buildings size={78} weight="duotone" aria-hidden="true" />
-        <span>{location.category === "pti_fkip" ? "Ruang PTI dan FKIP" : "Landmark UMS"}</span>
-      </div>
+      {location.photo ? (
+        <div className="location-photo">
+          <img src={location.photo} alt={`Foto ${location.title}`} />
+          <span>{location.category === "pti_fkip" ? "Ruang PTI dan FKIP" : "Landmark UMS"}</span>
+        </div>
+      ) : (
+        <div className="location-art" style={{ "--location-accent": location.accent } as React.CSSProperties}>
+          <Buildings size={78} weight="duotone" aria-hidden="true" />
+          <span>{location.category === "pti_fkip" ? "Ruang PTI dan FKIP" : "Landmark UMS"}</span>
+        </div>
+      )}
       <div className="location-content">
         <div className="location-heading">
           <span>{location.id}</span>
@@ -216,6 +223,17 @@ function LocationModal() {
           </div>
         </div>
         <div className="visited-confirmation"><CheckCircle size={20} weight="fill" /> Lokasi tercatat dalam perjalananmu</div>
+        {location.link && (
+          <a
+            className="primary-button full-button location-link-button"
+            href={location.link}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ArrowSquareOut size={18} weight="bold" />
+            Kunjungi {location.title}
+          </a>
+        )}
         <button className="primary-button full-button" type="button" onClick={closeLocation}>Tutup dan lanjut jelajah</button>
       </div>
     </Dialog>

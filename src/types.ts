@@ -28,6 +28,8 @@ export interface CampusLocation {
   shortDescription: string;
   primaryFunction: string;
   interestingFact: string;
+  photo?: string;
+  link?: string;
 }
 
 export type CameraMode = "follow" | "overview";

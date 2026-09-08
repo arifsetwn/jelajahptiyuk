@@ -15,7 +15,10 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Mahasiswa baru dapat mengunjungi Bookstore UMS untuk menukarkan voucher buku dan memperoleh kebutuhan penunjang perkuliahan.",
     primaryFunction: "Layanan buku dan kebutuhan akademik mahasiswa.",
-    interestingFact: "Bookstore menjadi salah satu titik awal perjalanan mahasiswa baru.",
+    interestingFact:
+      "Setiap mahasiswa UMS mendapatkan voucher penukaran buku di setiap semester hingga lulus — mulai semester 1 sampai 7 untuk mahasiswa S1.",
+    photo: "/photos/bookstore-ums.jpg",
+    link: "https://store.ums.ac.id/",
   },
   {
     id: "L04",
