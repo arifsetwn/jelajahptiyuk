@@ -2,6 +2,17 @@
 
 MVP website eksplorasi kampus 3D untuk promosi Program Studi Pendidikan Teknik Informatika Universitas Muhammadiyah Surakarta.
 
+## Tech Stack
+
+- **Framework**: React with Vite (TypeScript)
+- **3D Engine**: Three.js via @react-three/fiber and @react-three/drei
+- **Physics**: @react-three/rapier
+- **State Management**: Zustand
+- **Styling**: Tailwind CSS (via @tailwindcss/vite) and custom CSS
+- **Testing**: Vitest & jsdom
+- **Build Tool**: Vite
+
+
 ## Fitur
 
 - Diorama kampus low-poly yang dibuat secara procedural tanpa Blender.
