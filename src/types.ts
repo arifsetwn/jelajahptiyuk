@@ -28,7 +28,7 @@ export interface CampusLocation {
   shortDescription: string;
   primaryFunction: string;
   interestingFact: string;
-  photo?: string;
+  photos?: string[];
   link?: string;
 }
 

@@ -187,6 +187,45 @@ function NearbyPrompt() {
   );
 }
 
+function PhotoCarousel({ photos, title, category }: { photos: string[]; title: string; category: string }) {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const resetTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setCurrent((i) => (i + 1) % photos.length), 4000);
+  };
+
+  useEffect(() => {
+    resetTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [photos.length]);
+
+  const go = (idx: number) => { setCurrent((idx + photos.length) % photos.length); resetTimer(); };
+
+  return (
+    <div className="location-carousel" aria-label={`Foto ${title}`}>
+      <div className="location-carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
+        {photos.map((src, i) => (
+          <img key={src} src={src} alt={`${title} foto ${i + 1}`} loading={i === 0 ? "eager" : "lazy"} />
+        ))}
+      </div>
+      {photos.length > 1 && (
+        <>
+          <button className="carousel-arrow carousel-arrow-prev" onClick={() => go(current - 1)} aria-label="Foto sebelumnya">&#8249;</button>
+          <button className="carousel-arrow carousel-arrow-next" onClick={() => go(current + 1)} aria-label="Foto berikutnya">&#8250;</button>
+          <div className="carousel-dots">
+            {photos.map((_, i) => (
+              <button key={i} className={`carousel-dot ${i === current ? "is-active" : ""}`} onClick={() => go(i)} aria-label={`Foto ${i + 1}`} />
+            ))}
+          </div>
+        </>
+      )}
+      <span className="carousel-badge">{category === "pti_fkip" ? "Ruang PTI dan FKIP" : "Landmark UMS"}</span>
+    </div>
+  );
+}
+
 function LocationModal() {
   const activeId = useExperience((state) => state.activeLocationId);
   const closeLocation = useExperience((state) => state.closeLocation);
@@ -195,11 +234,8 @@ function LocationModal() {
 
   return (
     <Dialog title={location.title} onClose={closeLocation} className="location-dialog">
-      {location.photo ? (
-        <div className="location-photo">
-          <img src={location.photo} alt={`Foto ${location.title}`} />
-          <span>{location.category === "pti_fkip" ? "Ruang PTI dan FKIP" : "Landmark UMS"}</span>
-        </div>
+      {location.photos && location.photos.length > 0 ? (
+        <PhotoCarousel photos={location.photos} title={location.title} category={location.category} />
       ) : (
         <div className="location-art" style={{ "--location-accent": location.accent } as React.CSSProperties}>
           <Buildings size={78} weight="duotone" aria-hidden="true" />

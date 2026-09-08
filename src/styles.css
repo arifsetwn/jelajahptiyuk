@@ -587,36 +587,99 @@ kbd {
   line-height: 1.1;
 }
 
-.location-photo {
+/* ── Photo Carousel ─────────────────────────────────── */
+.location-carousel {
   position: relative;
-  min-height: 220px;
-  max-height: 280px;
+  height: 280px;
   overflow: hidden;
-  display: flex;
-  align-items: flex-end;
+  background: #111;
+  flex-shrink: 0;
 }
 
-.location-photo img {
-  position: absolute;
-  inset: 0;
+.location-carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.location-carousel-track img {
+  flex: 0 0 100%;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
 }
 
-.location-photo span {
-  position: relative;
-  z-index: 1;
-  margin: 12px 20px;
+/* Arrow buttons */
+.carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.carousel-arrow:hover { background: rgba(0, 0, 0, 0.75); }
+.carousel-arrow-prev { left: 10px; }
+.carousel-arrow-next { right: 10px; }
+
+/* Dot indicators */
+.carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.carousel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.25s, transform 0.25s;
+}
+
+.carousel-dot.is-active {
+  background: #fff;
+  transform: scale(1.3);
+}
+
+/* Badge label */
+.carousel-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 14px;
   padding: 4px 12px;
   background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(6px);
   border-radius: 6px;
   color: #fff;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.04em;
+  z-index: 10;
 }
 
 .location-link-button {

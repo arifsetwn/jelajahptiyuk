@@ -17,7 +17,11 @@ export const locations: CampusLocation[] = [
     primaryFunction: "Layanan buku dan kebutuhan akademik mahasiswa.",
     interestingFact:
       "Setiap mahasiswa UMS mendapatkan voucher penukaran buku di setiap semester hingga lulus — mulai semester 1 sampai 7 untuk mahasiswa S1.",
-    photo: "/photos/bookstore-ums.jpg",
+    photos: [
+      "/photos/bookstore-ums.jpg",
+      "/photos/bookstore-ums-2.jpg",
+      "/photos/bookstore-ums-3.jpg",
+    ],
     link: "https://store.ums.ac.id/",
   },
   {
