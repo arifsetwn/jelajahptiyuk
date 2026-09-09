@@ -2,6 +2,8 @@
 
 MVP website eksplorasi kampus 3D untuk promosi Program Studi Pendidikan Teknik Informatika Universitas Muhammadiyah Surakarta.
 
+![Banner Jelajah PTI UMS](./public/promo/jelajah-pti-ums-footer.png)
+
 ## Tech Stack
 
 - **Framework**: React with Vite (TypeScript)
@@ -60,6 +62,20 @@ npm test
 - `E` atau `Space`: membuka informasi lokasi terdekat.
 - `M`: membuka atau menutup peta.
 - Tombol arah pada layar: kontrol mobile.
+
+## Aset promosi
+
+### Media sosial
+
+<img src="./public/promo/jelajah-pti-ums-instagram.png" alt="Poster media sosial Jelajah PTI UMS" width="480" />
+
+### Sidebar blog
+
+<img src="./public/promo/jelajah-pti-ums-sidebar.png" alt="Banner sidebar blog Jelajah PTI UMS" width="300" />
+
+### Footer website
+
+![Banner footer website Jelajah PTI UMS](./public/promo/jelajah-pti-ums-footer.png)
 
 ## Struktur utama
 
