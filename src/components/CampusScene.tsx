@@ -37,6 +37,85 @@ function CampusRoads() {
   );
 }
 
+function GradientSky() {
+  const uniforms = useMemo(() => ({
+    horizonColor: { value: new THREE.Color("#c7ebf4") },
+    middleColor: { value: new THREE.Color("#86cbed") },
+    zenithColor: { value: new THREE.Color("#3b9dde") },
+  }), []);
+
+  return (
+    <mesh scale={175} renderOrder={-1000}>
+      <sphereGeometry args={[1, 48, 24]} />
+      <shaderMaterial
+        side={THREE.BackSide}
+        depthWrite={false}
+        fog={false}
+        uniforms={uniforms}
+        vertexShader={`
+          varying vec3 vDirection;
+          void main() {
+            vDirection = normalize(position);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `}
+        fragmentShader={`
+          uniform vec3 horizonColor;
+          uniform vec3 middleColor;
+          uniform vec3 zenithColor;
+          varying vec3 vDirection;
+          void main() {
+            float height = clamp(vDirection.y * 0.5 + 0.5, 0.0, 1.0);
+            vec3 lowerSky = mix(horizonColor, middleColor, smoothstep(0.38, 0.68, height));
+            vec3 sky = mix(lowerSky, zenithColor, smoothstep(0.62, 1.0, height));
+            gl_FragColor = vec4(sky, 1.0);
+          }
+        `}
+      />
+    </mesh>
+  );
+}
+
+const riverCenterZ = (x: number) => 33 + Math.sin(x * 0.085) * 1.55;
+
+function RiverBankColliders() {
+  const segments = useMemo(() => {
+    const ranges: Array<[number, number]> = [[-40, -22.5], [-15.5, 15.5], [22.5, 40]];
+    return ranges.flatMap(([start, end]) => {
+      const length = end - start;
+      const count = Math.ceil(length / 4);
+      return Array.from({ length: count }, (_, index) => {
+        const x0 = start + (length * index) / count;
+        const x1 = start + (length * (index + 1)) / count;
+        const x = (x0 + x1) / 2;
+        return { x, halfLength: (x1 - x0) / 2 + 0.08, z: riverCenterZ(x) };
+      });
+    });
+  }, []);
+
+  return (
+    <>
+      {segments.flatMap(({ x, halfLength, z }, index) => [-1, 1].map((side) => {
+        const bankZ = z + side * 1.88;
+        return (
+          <CuboidCollider
+            key={`river-bank-${index}-${side}`}
+            args={[halfLength, 0.82, 0.16]}
+            position={[x, worldSurfaceY(x, bankZ) + 0.82, bankZ]}
+          />
+        );
+      }))}
+      {[-40, 40].map((x) => (
+        <CuboidCollider
+          key={`river-end-${x}`}
+          args={[0.16, 0.82, 1.9]}
+          position={[x, worldSurfaceY(x, riverCenterZ(x)) + 0.82, riverCenterZ(x)]}
+        />
+      ))}
+    </>
+  );
+}
+
 function LocationMarker({
   id,
   position,
@@ -94,6 +173,7 @@ function World() {
   return (
     <>
       <color attach="background" args={["#b9def0"]} />
+      <GradientSky />
       <fog attach="fog" args={["#b9def0", 94, 170]} />
       <ambientLight intensity={1.65} />
       <directionalLight
@@ -117,6 +197,7 @@ function World() {
 
         <CampusRoads />
         <CampusRiver />
+        <RiverBankColliders />
 
         <CuboidCollider args={[1.18, 1.55, 1.3]} position={[-23.45, worldSurfaceY(-23.45, 26.85) + 1.55, 26.85]} />
         <CuboidCollider args={[1.18, 1.55, 1.3]} position={[-14.55, worldSurfaceY(-14.55, 26.85) + 1.55, 26.85]} />
@@ -127,6 +208,15 @@ function World() {
           position={[-10.28, worldSurfaceY(-10.28, -14.51) + 0.9, -14.51]}
           rotation={[0, -0.08, 0]}
         />
+
+        {[-5.8, -1.8].map((x) => (
+          <CuboidCollider
+            key={`coworking-table-${x}`}
+            args={[1.35, 0.5, 0.52]}
+            position={[x, worldSurfaceY(x, -10.25) + 0.5, -10.25]}
+            rotation={[0, -0.08, 0]}
+          />
+        ))}
 
         <CylinderCollider
           args={[0.9, 6.85]}

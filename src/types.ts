@@ -34,6 +34,7 @@ export interface CampusLocation {
   interestingFact: string;
   photos?: string[];
   link?: string;
+  linkLabel?: string;
 }
 
 export type CameraMode = "follow" | "overview";

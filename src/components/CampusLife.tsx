@@ -1,4 +1,5 @@
 import { useFrame } from "@react-three/fiber";
+import { CuboidCollider, RigidBody, type RapierRigidBody } from "@react-three/rapier";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { worldSurfaceTilt, worldSurfaceY } from "../worldGeometry";
@@ -71,8 +72,8 @@ function Airplane() {
   );
 }
 
-function CampusBus() {
-  const bus = useRef<THREE.Group>(null);
+function CampusBus({ color = "#d92f32", phase = 0 }: { color?: string; phase?: number }) {
+  const bus = useRef<RapierRigidBody>(null);
   const wheelGroups = useRef<Array<THREE.Group | null>>([]);
   const route = useMemo(
     () => new THREE.CatmullRomCurve3(
@@ -95,28 +96,31 @@ function CampusBus() {
 
   useFrame(({ clock }, delta) => {
     if (!bus.current) return;
-    const progress = (clock.elapsedTime * 0.031) % 1;
+    const progress = (clock.elapsedTime * 0.031 + phase) % 1;
     const routePoint = route.getPointAt(progress);
     const tangent = route.getTangentAt(progress);
     const x = routePoint.x;
     const z = routePoint.z;
-    bus.current.position.set(x, worldSurfaceY(x, z) + 0.1, z);
+    bus.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.1, z });
     const tilt = worldSurfaceTilt(x, z);
-    bus.current.rotation.set(tilt[0], Math.atan2(tangent.x, tangent.z), tilt[2]);
+    const rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(tilt[0], Math.atan2(tangent.x, tangent.z), tilt[2]));
+    bus.current.setNextKinematicRotation(rotation);
     wheelGroups.current.forEach((wheel) => {
       if (wheel) wheel.rotation.x -= delta * 8;
     });
   });
 
   return (
-    <group ref={bus} scale={0.82}>
+    <RigidBody ref={bus} type="kinematicPosition" colliders={false} position={[-19, 0, -17]}>
+      <CuboidCollider args={[0.78, 1.05, 1.72]} position={[0, 1.12, 0]} />
+      <group scale={0.82}>
       <mesh position={[0, 1.35, 0]} castShadow>
         <boxGeometry args={[1.8, 2.35, 4.2]} />
-        <meshStandardMaterial color="#d92f32" flatShading roughness={0.72} />
+        <meshStandardMaterial color={color} flatShading roughness={0.72} />
       </mesh>
       <mesh position={[0, 2.18, 0]} castShadow>
         <boxGeometry args={[1.86, 0.18, 4.28]} />
-        <meshStandardMaterial color="#b91f27" />
+        <meshStandardMaterial color={color} />
       </mesh>
       {[-0.92, 0.92].map((x) => (
         <group key={`bus-side-${x}`}>
@@ -152,7 +156,8 @@ function CampusBus() {
           </mesh>
         </group>
       ))}
-    </group>
+      </group>
+    </RigidBody>
   );
 }
 
@@ -347,6 +352,156 @@ function WalkingNpc({ start, end, speed, phase, shirt }: { start: [number, numbe
   );
 }
 
+function SimpleStudent({ shirt, seated = false }: { shirt: string; seated?: boolean }) {
+  return (
+    <group scale={0.68}>
+      <mesh position={[0, seated ? 1.35 : 1.72, 0]} castShadow><sphereGeometry args={[0.28, 10, 7]} /><meshStandardMaterial color="#bd835e" flatShading /></mesh>
+      <mesh position={[0, seated ? 0.78 : 1.05, 0]} castShadow><boxGeometry args={[0.7, 0.84, 0.4]} /><meshStandardMaterial color={shirt} flatShading /></mesh>
+      {[-0.42, 0.42].map((x) => <mesh key={`arm-${x}`} position={[x, seated ? 0.72 : 1.02, 0.15]} rotation={[seated ? -0.75 : 0, 0, x < 0 ? -0.12 : 0.12]} castShadow><boxGeometry args={[0.18, 0.7, 0.18]} /><meshStandardMaterial color="#d9d4c8" flatShading /></mesh>)}
+      {[-0.2, 0.2].map((x) => <mesh key={`leg-${x}`} position={[x, seated ? 0.34 : 0.3, seated ? 0.34 : 0]} rotation={[seated ? -Math.PI / 2 : 0, 0, 0]} castShadow><boxGeometry args={[0.23, 0.72, 0.25]} /><meshStandardMaterial color="#344e68" flatShading /></mesh>)}
+    </group>
+  );
+}
+
+function GardenStudents() {
+  const x = -8;
+  const z = 23;
+  return (
+    <group position={[x, worldSurfaceY(x, z), z]} rotation={worldSurfaceTilt(x, z)}>
+      <mesh position={[0, 0.36, 0]} castShadow><boxGeometry args={[3.2, 0.24, 0.62]} /><meshStandardMaterial color="#9a6847" roughness={0.9} /></mesh>
+      {[-1.35, 1.35].map((postX) => <mesh key={postX} position={[postX, 0.18, 0]} castShadow><boxGeometry args={[0.16, 0.36, 0.52]} /><meshStandardMaterial color="#72503b" /></mesh>)}
+      <group position={[-0.7, 0.5, -0.05]} rotation={[0, 0.2, 0]}><SimpleStudent seated shirt="#397eb6" /></group>
+      <group position={[0.7, 0.5, -0.05]} rotation={[0, -0.2, 0]}><SimpleStudent seated shirt="#d45f59" /></group>
+    </group>
+  );
+}
+
+function StudentBoat() {
+  const boat = useRef<THREE.Group>(null);
+  const paddles = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!boat.current) return;
+    const cycle = (Math.sin(clock.elapsedTime * 0.22) + 1) / 2;
+    const x = THREE.MathUtils.lerp(-13, 13, cycle);
+    const z = 33 + Math.sin(x * 0.085) * 1.55;
+    boat.current.position.set(x, worldSurfaceY(x, z) + 0.24 + Math.sin(clock.elapsedTime * 1.7) * 0.035, z);
+    boat.current.rotation.y = Math.cos(clock.elapsedTime * 0.22) >= 0 ? Math.PI / 2 : -Math.PI / 2;
+    if (paddles.current) paddles.current.rotation.z = Math.sin(clock.elapsedTime * 2.3) * 0.48;
+  });
+  return (
+    <group ref={boat} scale={0.72}>
+      <mesh castShadow scale={[1, 0.55, 1]}><cylinderGeometry args={[0.78, 0.46, 3.7, 4]} /><meshStandardMaterial color="#c8733d" flatShading /></mesh>
+      <mesh position={[0, 0.33, 0]} castShadow><boxGeometry args={[1.08, 0.18, 2.35]} /><meshStandardMaterial color="#704535" /></mesh>
+      <group position={[0, 0.34, -0.35]}><SimpleStudent seated shirt="#2d8b74" /></group>
+      <group ref={paddles} position={[0, 0.85, 0.05]}>
+        <mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.035, 0.035, 3.2, 7]} /><meshStandardMaterial color="#dfc38a" /></mesh>
+        {[-1.62, 1.62].map((x) => <mesh key={x} position={[x, 0, 0]} castShadow><boxGeometry args={[0.5, 0.12, 0.28]} /><meshStandardMaterial color="#d7a24c" /></mesh>)}
+      </group>
+    </group>
+  );
+}
+
+function SoccerPlayers() {
+  const ball = useRef<THREE.Mesh>(null);
+  const runnerA = useRef<THREE.Group>(null);
+  const runnerB = useRef<THREE.Group>(null);
+  const x = 3.8;
+  const z = -12;
+  useFrame(({ clock }) => {
+    const sway = Math.sin(clock.elapsedTime * 1.35);
+    if (ball.current) ball.current.position.set(sway * 1.7, 0.3 + Math.abs(Math.sin(clock.elapsedTime * 2.7)) * 0.16, 0.8);
+    if (runnerA.current) runnerA.current.position.x = sway * 0.8 - 1.25;
+    if (runnerB.current) runnerB.current.position.x = sway * 0.8 + 1.25;
+  });
+  return (
+    <group position={[x, worldSurfaceY(x, z) + 0.13, z]} rotation={worldSurfaceTilt(x, z)}>
+      <group ref={runnerA} position={[-1.25, 0, 0]} rotation={[0, 0.3, 0]}><SimpleStudent shirt="#f0c63e" /></group>
+      <group ref={runnerB} position={[1.25, 0, 1.45]} rotation={[0, -2.7, 0]}><SimpleStudent shirt="#316fba" /></group>
+      <mesh ref={ball} position={[0, 0.3, 0.8]} castShadow><sphereGeometry args={[0.22, 10, 7]} /><meshStandardMaterial color="#f7f4e7" flatShading /></mesh>
+    </group>
+  );
+}
+
+function CampusCar() {
+  const car = useRef<RapierRigidBody>(null);
+  useFrame(({ clock }) => {
+    if (!car.current) return;
+    const progress = (clock.elapsedTime * 0.035 + 0.38) % 1;
+    const x = 43 - progress * 86;
+    const z = 8.4;
+    car.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.12, z });
+    const tilt = worldSurfaceTilt(x, z);
+    car.current.setNextKinematicRotation(new THREE.Quaternion().setFromEuler(new THREE.Euler(tilt[0], -Math.PI / 2, tilt[2])));
+  });
+  return (
+    <RigidBody ref={car} type="kinematicPosition" colliders={false} position={[0, 0, 8.4]}>
+      <CuboidCollider args={[0.68, 0.58, 1.2]} position={[0, 0.78, 0]} />
+      <group scale={0.72}>
+      <mesh position={[0, 0.72, 0]} castShadow><boxGeometry args={[1.75, 0.65, 3.25]} /><meshStandardMaterial color="#efefe8" flatShading /></mesh>
+      <mesh position={[0, 1.2, -0.22]} castShadow><boxGeometry args={[1.5, 0.72, 1.65]} /><meshStandardMaterial color="#4c82a2" flatShading /></mesh>
+      {[[-0.92, -1.05], [0.92, -1.05], [-0.92, 1.05], [0.92, 1.05]].map(([wheelX, wheelZ]) => <mesh key={`${wheelX}-${wheelZ}`} position={[wheelX, 0.42, wheelZ]} rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[0.34, 0.34, 0.2, 12]} /><meshStandardMaterial color="#222a2e" /></mesh>)}
+      </group>
+    </RigidBody>
+  );
+}
+
+function BecakWheel({ position, radius = 0.72 }: { position: [number, number, number]; radius?: number }) {
+  return (
+    <group position={position}>
+      <mesh rotation={[0, Math.PI / 2, 0]} castShadow><torusGeometry args={[radius, 0.075, 8, 24]} /><meshStandardMaterial color="#16877d" roughness={0.72} /></mesh>
+      <mesh rotation={[0, Math.PI / 2, 0]}><circleGeometry args={[0.13, 12]} /><meshStandardMaterial color="#54656a" side={THREE.DoubleSide} /></mesh>
+      {Array.from({ length: 10 }, (_, index) => (
+        <mesh key={index} rotation={[index * Math.PI / 10, 0, 0]}>
+          <boxGeometry args={[0.025, radius * 1.72, 0.025]} />
+          <meshStandardMaterial color="#d8dedb" metalness={0.25} roughness={0.5} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function Becak() {
+  const becak = useRef<RapierRigidBody>(null);
+  useFrame(({ clock }) => {
+    if (!becak.current) return;
+    const progress = (clock.elapsedTime * 0.027 + 0.7) % 1;
+    const x = -42 + progress * 84;
+    const z = 11.7;
+    becak.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.08, z });
+    const tilt = worldSurfaceTilt(x, z);
+    becak.current.setNextKinematicRotation(new THREE.Quaternion().setFromEuler(new THREE.Euler(tilt[0], Math.PI / 2, tilt[2])));
+  });
+  return (
+    <RigidBody ref={becak} type="kinematicPosition" colliders={false} position={[0, 0, 11.7]}>
+      <CuboidCollider args={[0.8, 1.05, 1.25]} position={[0, 1.12, -0.08]} />
+      <group scale={0.82}>
+      <BecakWheel position={[-0.93, 0.72, 0.65]} />
+      <BecakWheel position={[0.93, 0.72, 0.65]} />
+      <BecakWheel position={[0, 0.62, -1.45]} radius={0.6} />
+
+      <mesh position={[0, 0.7, 0.55]} castShadow><boxGeometry args={[1.62, 0.88, 1.2]} /><meshStandardMaterial color="#d8d4cc" flatShading /></mesh>
+      <mesh position={[0, 0.92, 1.12]} castShadow><boxGeometry args={[1.5, 0.78, 0.12]} /><meshStandardMaterial color="#bfc5c1" flatShading /></mesh>
+      <mesh position={[0, 0.54, 0.34]} castShadow><boxGeometry args={[1.28, 0.16, 0.72]} /><meshStandardMaterial color="#f0ede4" /></mesh>
+      {[-0.78, 0.78].map((postX) => (
+        <group key={postX}>
+          <mesh position={[postX, 1.62, 0.02]} castShadow><cylinderGeometry args={[0.04, 0.04, 2.1, 6]} /><meshStandardMaterial color="#237e88" /></mesh>
+          <mesh position={[postX, 1.62, 1.02]} castShadow><cylinderGeometry args={[0.04, 0.04, 2.1, 6]} /><meshStandardMaterial color="#237e88" /></mesh>
+        </group>
+      ))}
+      <mesh position={[0, 2.66, 0.48]} rotation={[0.05, 0, 0]} castShadow><boxGeometry args={[1.96, 0.12, 1.75]} /><meshStandardMaterial color="#53aeb0" flatShading /></mesh>
+
+      <mesh position={[0, 0.86, -0.42]} rotation={[0.62, 0, 0]} castShadow><boxGeometry args={[0.09, 0.09, 2.55]} /><meshStandardMaterial color="#246a78" /></mesh>
+      <mesh position={[0, 0.78, -0.73]} rotation={[-0.62, 0, 0]} castShadow><boxGeometry args={[0.09, 0.09, 1.72]} /><meshStandardMaterial color="#246a78" /></mesh>
+      <mesh position={[0, 1.06, -0.72]} castShadow><boxGeometry args={[1.05, 0.08, 0.08]} /><meshStandardMaterial color="#246a78" /></mesh>
+      <mesh position={[0, 1.18, -1.17]} rotation={[0.25, 0, 0]} castShadow><boxGeometry args={[0.54, 0.12, 0.3]} /><meshStandardMaterial color="#4a352d" /></mesh>
+      <mesh position={[0, 0.62, -0.92]} rotation={[0, 0, Math.PI / 2]}><torusGeometry args={[0.18, 0.035, 7, 16]} /><meshStandardMaterial color="#d5b148" /></mesh>
+      {[-0.32, 0.32].map((pedalX) => <mesh key={pedalX} position={[pedalX, 0.62, -0.92]} castShadow><boxGeometry args={[0.36, 0.06, 0.12]} /><meshStandardMaterial color="#5a6264" /></mesh>)}
+      <group position={[0, 0.54, -0.96]} rotation={[0, 0, 0]}><SimpleStudent seated shirt="#236b98" /></group>
+      </group>
+    </RigidBody>
+  );
+}
+
 export function CampusLife() {
   return (
     <group>
@@ -360,7 +515,13 @@ export function CampusLife() {
       <Cloud base={[34, 13, -18]} speed={0.34} scale={1.1} />
       <Cloud base={[-18, 11.5, 22]} speed={0.24} scale={0.78} />
       <CampusBus />
+      <CampusBus color="#2e70bd" phase={0.5} />
       <GojekMotor />
+      <CampusCar />
+      <Becak />
+      <GardenStudents />
+      <StudentBoat />
+      <SoccerPlayers />
       <WalkingNpc start={[-39, 6]} end={[-25, 6]} speed={0.055} phase={0.2} shirt="#d66559" />
       <WalkingNpc start={[-14, 14.5]} end={[3, 14.5]} speed={0.045} phase={0.9} shirt="#695fa9" />
       <WalkingNpc start={[23, -16]} end={[23, 2]} speed={0.05} phase={1.4} shirt="#e1aa3d" />

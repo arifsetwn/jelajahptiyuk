@@ -239,6 +239,51 @@ function ILoveFkipLandmark() {
   );
 }
 
+function StudyingNpc({ shirt, rotation = 0 }: { shirt: string; rotation?: number }) {
+  return (
+    <group rotation={[0, rotation, 0]} scale={0.58}>
+      <mesh position={[0, 1.2, 0]} castShadow><sphereGeometry args={[0.28, 9, 6]} /><meshStandardMaterial color="#c88d69" flatShading /></mesh>
+      <mesh position={[0, 0.7, 0]} castShadow><boxGeometry args={[0.66, 0.72, 0.4]} /><meshStandardMaterial color={shirt} flatShading /></mesh>
+      {[-0.2, 0.2].map((x) => <mesh key={x} position={[x, 0.3, 0.26]} rotation={[-Math.PI / 2, 0, 0]} castShadow><boxGeometry args={[0.2, 0.62, 0.22]} /><meshStandardMaterial color="#334c67" /></mesh>)}
+      {[-0.38, 0.38].map((x) => <mesh key={`study-arm-${x}`} position={[x, 0.72, 0.26]} rotation={[-0.82, 0, x < 0 ? -0.08 : 0.08]} castShadow><boxGeometry args={[0.16, 0.62, 0.16]} /><meshStandardMaterial color="#c88d69" /></mesh>)}
+    </group>
+  );
+}
+
+function StudyTable({ x, students }: { x: number; students: [string, string, string] }) {
+  return (
+    <group position={[x, 0, 6.35]}>
+      <Box position={[0, 0.72, 0]} scale={[2.7, 0.16, 1.05]} color="#d8b675" radius={0.04} />
+      {[-1.05, 1.05].flatMap((legX) => [-0.36, 0.36].map((legZ) => <mesh key={`${legX}-${legZ}`} position={[legX, 0.35, legZ]} castShadow><boxGeometry args={[0.1, 0.7, 0.1]} /><meshStandardMaterial color="#435b61" /></mesh>))}
+      <group position={[-0.75, 0.32, 0.9]}><StudyingNpc shirt={students[0]} /></group>
+      <group position={[0.75, 0.32, 0.9]}><StudyingNpc shirt={students[1]} /></group>
+      <group position={[0, 0.32, -0.9]}><StudyingNpc shirt={students[2]} rotation={Math.PI} /></group>
+      {[-0.72, 0.05, 0.72].map((laptopX, index) => (
+        <group key={laptopX} position={[laptopX, 0.87, index === 1 ? -0.18 : 0.18]} rotation={[0, index === 1 ? Math.PI : 0, 0]}>
+          <mesh rotation={[-0.26, 0, 0]} castShadow><boxGeometry args={[0.58, 0.06, 0.4]} /><meshStandardMaterial color="#344b5b" /></mesh>
+          <mesh position={[0, 0.25, -0.18]} rotation={[-0.18, 0, 0]} castShadow><boxGeometry args={[0.58, 0.42, 0.04]} /><meshStandardMaterial color="#6da9bc" /></mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+function OutdoorCoworkingSpace() {
+  return (
+    <group position={[6.2, 0, 1.4]}>
+      <Box position={[0, 0.07, 6.35]} scale={[7.7, 0.14, 3.8]} color="#d9d1bc" radius={0.1} />
+      {[-3.55, 3.55].flatMap((x) => [4.72, 7.98].map((z) => <mesh key={`${x}-${z}`} position={[x, 1.45, z]} castShadow><cylinderGeometry args={[0.07, 0.09, 2.8, 8]} /><meshStandardMaterial color="#315f73" /></mesh>))}
+      {[-3, -2, -1, 0, 1, 2, 3].map((x) => <mesh key={`pergola-${x}`} position={[x, 2.84, 6.35]} castShadow><boxGeometry args={[0.14, 0.12, 3.65]} /><meshStandardMaterial color="#e2bd70" /></mesh>)}
+      <Box position={[0, 2.76, 4.72]} scale={[7.25, 0.14, 0.14]} color="#315f73" radius={0.02} />
+      <Box position={[0, 2.76, 7.98]} scale={[7.25, 0.14, 0.14]} color="#315f73" radius={0.02} />
+      <StudyTable x={-2} students={["#2e7eb0", "#d45a59", "#d3a338"]} />
+      <StudyTable x={2} students={["#418866", "#745fa7", "#d56d43"]} />
+      <Box position={[0, 0.83, 8.05]} scale={[2.2, 0.18, 0.52]} color="#4e725f" radius={0.04} />
+      {[-0.72, 0, 0.72].map((x) => <mesh key={`plant-${x}`} position={[x, 1.22, 8.05]} castShadow><sphereGeometry args={[0.34, 9, 6]} /><meshStandardMaterial color="#4d9b68" flatShading /></mesh>)}
+    </group>
+  );
+}
+
 function Bookstore() {
   return (
     <group>
@@ -302,6 +347,22 @@ function PointedArchRib({
 function SitiWalidah() {
   const facadeBays = [-1.05, -0.7, -0.35, 0, 0.35, 0.7, 1.05];
   const floorBands = [2.05, 3.03, 4.01, 4.99, 5.97, 6.95];
+  const flagTexture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 160;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.fillStyle = "#d83b36";
+      context.fillRect(0, 0, 256, 80);
+      context.fillStyle = "#f7f5ee";
+      context.fillRect(0, 80, 256, 80);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 4;
+    return texture;
+  }, []);
 
   return (
     <group scale={[0.9, 0.84, 0.9]}>
@@ -419,13 +480,9 @@ function SitiWalidah() {
         <cylinderGeometry args={[0.035, 0.045, 2.75, 8]} />
         <meshStandardMaterial color="#6f7473" roughness={0.65} />
       </mesh>
-      <mesh position={[0.29, 2.32, 9.46]} castShadow>
-        <planeGeometry args={[0.58, 0.38]} />
-        <meshStandardMaterial color="#c5413b" side={2} />
-      </mesh>
-      <mesh position={[0.29, 2.13, 9.46]} castShadow>
-        <planeGeometry args={[0.58, 0.38]} />
-        <meshStandardMaterial color="#f4f0e8" side={2} />
+      <mesh position={[0.36, 2.22, 9.55]}>
+        <planeGeometry args={[0.72, 0.48]} />
+        <meshBasicMaterial map={flagTexture} side={THREE.DoubleSide} toneMapped={false} />
       </mesh>
     </group>
   );
@@ -678,6 +735,77 @@ function SwimmingDuck({ radius, speed, phase, scale = 1 }: { radius: number; spe
   );
 }
 
+function DiningNpc({ shirt, rotation = 0 }: { shirt: string; rotation?: number }) {
+  return (
+    <group rotation={[0, rotation, 0]} scale={0.54}>
+      <mesh position={[0, 1.2, 0]} castShadow><sphereGeometry args={[0.28, 9, 6]} /><meshStandardMaterial color="#c58a67" flatShading /></mesh>
+      <mesh position={[0, 0.68, 0]} castShadow><boxGeometry args={[0.66, 0.72, 0.4]} /><meshStandardMaterial color={shirt} flatShading /></mesh>
+      {[-0.2, 0.2].map((x) => <mesh key={x} position={[x, 0.28, 0.26]} rotation={[-Math.PI / 2, 0, 0]} castShadow><boxGeometry args={[0.2, 0.64, 0.22]} /><meshStandardMaterial color="#314b64" /></mesh>)}
+      <mesh position={[-0.38, 0.75, 0.24]} rotation={[-0.72, 0, -0.1]} castShadow><boxGeometry args={[0.16, 0.62, 0.16]} /><meshStandardMaterial color="#c58a67" flatShading /></mesh>
+      <mesh position={[0.38, 0.75, 0.24]} rotation={[-0.72, 0, 0.1]} castShadow><boxGeometry args={[0.16, 0.62, 0.16]} /><meshStandardMaterial color="#c58a67" flatShading /></mesh>
+    </group>
+  );
+}
+
+function FoodCourtTable({ position, colors }: { position: [number, number, number]; colors: [string, string, string, string] }) {
+  return (
+    <group position={position}>
+      <mesh position={[0, 0.66, 0]} castShadow><cylinderGeometry args={[0.72, 0.72, 0.12, 12]} /><meshStandardMaterial color="#eee4cd" roughness={0.82} /></mesh>
+      <mesh position={[0, 0.32, 0]} castShadow><cylinderGeometry args={[0.08, 0.1, 0.65, 8]} /><meshStandardMaterial color="#52676c" /></mesh>
+      {[[0, 0, 1.05, 0], [1.05, 0, 0, Math.PI / 2], [0, 0, -1.05, Math.PI], [-1.05, 0, 0, -Math.PI / 2]].map(([x, , z, rotation], index) => (
+        <group key={index} position={[x, 0.28, z]} rotation={[0, rotation, 0]}>
+          <mesh position={[0, 0.24, 0.12]} castShadow><boxGeometry args={[0.54, 0.1, 0.5]} /><meshStandardMaterial color="#5a7779" /></mesh>
+          <DiningNpc shirt={colors[index]} />
+        </group>
+      ))}
+      {[[-0.24, 0.76, 0.05], [0.18, 0.76, -0.12]].map(([x, y, z], index) => <mesh key={`meal-${index}`} position={[x, y, z]}><cylinderGeometry args={[0.13, 0.15, 0.07, 10]} /><meshStandardMaterial color={index ? "#d96a38" : "#6da65b"} /></mesh>)}
+    </group>
+  );
+}
+
+function FoodCourt() {
+  const signTexture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 768;
+    canvas.height = 180;
+    const context = canvas.getContext("2d");
+    if (context) {
+      context.fillStyle = "#173456";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.fillStyle = "#fff4ca";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.font = "900 82px Arial, sans-serif";
+      context.fillText("FOOD COURT UMS", canvas.width / 2, canvas.height / 2);
+    }
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }, []);
+
+  const tenantColors = ["#e25b42", "#e4b33d", "#258c7c"];
+  return (
+    <group position={[7.4, 0.1, 0.4]}>
+      <Box position={[0, 0.08, 0]} scale={[7.2, 0.16, 5.7]} color="#d8d3c4" radius={0.08} />
+      <Box position={[0, 3.35, 0]} scale={[7.45, 0.16, 5.9]} color="#235f91" radius={0.05} />
+      {[-3.42, 3.42].flatMap((x) => [-2.62, 2.62].map((z) => <mesh key={`${x}-${z}`} position={[x, 1.7, z]} castShadow><cylinderGeometry args={[0.07, 0.09, 3.35, 8]} /><meshStandardMaterial color="#e8e5d9" /></mesh>))}
+      <mesh position={[0, 3.48, 0]} rotation={[0, 0, 0]} castShadow><boxGeometry args={[7.7, 0.12, 6.15]} /><meshStandardMaterial color="#2d78ae" flatShading /></mesh>
+      {[-2.35, 0, 2.35].map((x, index) => (
+        <group key={x} position={[x, 0, -2.05]}>
+          <Box position={[0, 1.15, 0]} scale={[2.05, 2.15, 1.25]} color="#f2ead7" radius={0.05} />
+          <Box position={[0, 1.65, 0.66]} scale={[1.82, 0.72, 0.12]} color={tenantColors[index]} radius={0.025} />
+          <Box position={[0, 0.74, 0.82]} scale={[1.9, 0.18, 0.65]} color="#8c6244" radius={0.025} />
+          {[-0.48, 0, 0.48].map((foodX) => <mesh key={foodX} position={[foodX, 0.93, 0.85]} castShadow><cylinderGeometry args={[0.12, 0.15, 0.16, 8]} /><meshStandardMaterial color="#e7a644" /></mesh>)}
+        </group>
+      ))}
+      <mesh position={[0, 2.55, -2.72]}><planeGeometry args={[4.8, 0.9]} /><meshBasicMaterial map={signTexture} toneMapped={false} /></mesh>
+      <FoodCourtTable position={[-1.9, 0, 0.75]} colors={["#d95555", "#3b7bb8", "#e4a73f", "#458a69"]} />
+      <FoodCourtTable position={[1.9, 0, 0.75]} colors={["#725fa7", "#db6f47", "#297d93", "#d4aa38"]} />
+      <FoodCourtTable position={[0, 0, 2.15]} colors={["#438b6c", "#ca5454", "#447ab0", "#d49c38"]} />
+    </group>
+  );
+}
+
 function Lakeside() {
   return (
     <group>
@@ -691,11 +819,7 @@ function Lakeside() {
       </mesh>
       <SwimmingDuck radius={3.7} speed={0.34} phase={0} />
       <SwimmingDuck radius={2.6} speed={-0.27} phase={2.4} scale={0.82} />
-      <Box position={[6.6, 1.05, 0.5]} scale={[4.2, 2.1, 3.3]} color="#f0d893" />
-      <mesh position={[6.6, 2.45, 0.5]} rotation={[0, 0, 0]} castShadow>
-        <coneGeometry args={[3.2, 1.4, 4]} />
-        <meshStandardMaterial color={red} flatShading />
-      </mesh>
+      <FoodCourt />
       <Tree position={[3, 0, 9]} scale={0.9} />
       <Tree position={[10, 0, 5]} scale={0.72} />
     </group>
@@ -979,7 +1103,7 @@ function GriyaMahasiswa() {
   return (
     <group>
       <Box position={[0, 3.25, 0]} scale={[8.6, 6.5, 4.8]} color="#e6e5df" radius={0.08} />
-      <Box position={[1.35, 5.72, 0]} scale={[5.9, 1.15, 4.95]} color="#68727e" radius={0.05} />
+      <Box position={[1.35, 5.72, 2.57]} scale={[5.9, 1.15, 0.14]} color="#68727e" radius={0.025} />
       {floors.map((y) => (
         <Box key={y} position={[1.28, y, 2.46]} scale={[5.55, 0.58, 0.16]} color="#466a78" radius={0.025} />
       ))}
@@ -1182,6 +1306,7 @@ export function CampusBuilding({ location }: { location: CampusLocation }) {
         <>
           <AcademicBuilding accent={red} floors={3} />
           <ILoveFkipLandmark />
+          <OutdoorCoworkingSpace />
         </>
       );
       break;

@@ -38,7 +38,13 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Gedung E menjadi salah satu lokasi kegiatan perkuliahan. Ruang kelasnya mendukung pembelajaran, presentasi, dan diskusi mahasiswa PTI.",
     primaryFunction: "Ruang perkuliahan dan kegiatan pembelajaran.",
-    interestingFact: "Suasana kelas dirancang untuk pembelajaran kolaboratif dan presentasi.",
+    interestingFact:
+      "Ruang kuliah PTI UMS terdiri dari 1 smart classroom dan 3 ruang kelas standar dengan fasilitas terbaik.",
+    photos: [
+      "/photos/gedung-e-1.jpg",
+      "/photos/gedung-e-2.jpg",
+      "/photos/gedung-e-3.jpg",
+    ],
   },
   {
     id: "L15",
@@ -55,7 +61,11 @@ export const locations: CampusLocation[] = [
       "GM (Griya Mahasiswa) merupakan pusat kegiatan organisasi kemahasiswaan di Universitas Muhammadiyah Surakarta (UMS).",
     primaryFunction: "Pusat kegiatan, koordinasi, dan pengembangan organisasi mahasiswa.",
     interestingFact:
-      "Fasad Griya Mahasiswa mudah dikenali melalui panel geometris putih dan tulisan merah pada bagian depan gedung.",
+      "Griya Mahasiswa UMS dibangun empat lantai sebagai basecamp seluruh UKM di UMS.",
+    photos: [
+      "/photos/griya-mahasiswa-ums-1.jpg",
+      "/photos/griya-mahasiswa-ums-2.jpg",
+    ],
   },
   {
     id: "L02",
@@ -71,7 +81,14 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Laboratorium komputer mendukung praktikum mahasiswa PTI, mulai dari pemrograman, multimedia, jaringan komputer, hingga media pembelajaran.",
     primaryFunction: "Praktikum komputasi dan pengembangan teknologi pendidikan.",
-    interestingFact: "Di ruang ini gagasan pembelajaran diterjemahkan menjadi produk digital.",
+    interestingFact:
+      "Gedung B menjadi pusat kegiatan praktikum di Prodi PTI. Di sini terdapat laboratorium komputer, laboratorium Digital Innovation, Lab Microteaching, dan laboratorium jaringan komputer.",
+    photos: [
+      "/photos/gedung-b-1.jpg",
+      "/photos/gedung-b-2.jpg",
+      "/photos/gedung-b-3.jpg",
+      "/photos/gedung-b-4.jpg",
+    ],
   },
   {
     id: "L03",
@@ -87,7 +104,15 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Area Gedung C memiliki landmark I Love FKIP dan ruang Tata Usaha yang membantu berbagai kebutuhan administrasi akademik mahasiswa.",
     primaryFunction: "Layanan administrasi dan ruang bersama FKIP.",
-    interestingFact: "I Love FKIP menjadi salah satu titik foto yang mudah dikenali mahasiswa.",
+    interestingFact:
+      "Selain digunakan sebagai gedung kuliah, Gedung C menjadi pusat layanan Fakultas Keguruan dan Ilmu Pendidikan UMS.",
+    photos: [
+      "/photos/gedung-c-1.jpg",
+      "/photos/gedung-c-2.jpg",
+      "/photos/gedung-c-3.jpg",
+    ],
+    link: "https://fkip.ums.ac.id/",
+    linkLabel: "Kunjungi Website FKIP UMS",
   },
   {
     id: "L13",
@@ -104,7 +129,16 @@ export const locations: CampusLocation[] = [
       "Kantor Program Studi Pendidikan Teknik Informatika menjadi pusat layanan akademik, konsultasi, dan koordinasi kegiatan mahasiswa PTI.",
     primaryFunction: "Layanan akademik dan administrasi Program Studi PTI.",
     interestingFact:
-      "Logo PTI Kreatif pada fasad mencerminkan semangat teknologi, kreativitas, dan pembelajaran interaktif.",
+      "Kurikulum PTI UMS disusun untuk mempersiapkan mahasiswa menjadi pendidik, IT engineer, dan technopreneur.",
+    photos: [
+      "/photos/kantor-prodi-pti-1.jpg",
+      "/photos/kantor-prodi-pti-2.jpg",
+      "/photos/kantor-prodi-pti-3.jpg",
+      "/photos/kantor-prodi-pti-4.jpg",
+      "/photos/kantor-prodi-pti-5.jpg",
+    ],
+    link: "https://pti.ums.ac.id/",
+    linkLabel: "Kunjungi Website PTI UMS",
   },
   {
     id: "L10",
@@ -119,7 +153,13 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Gedung Induk Siti Walidah merupakan pusat administrasi dan pelayanan terpadu Universitas Muhammadiyah Surakarta.",
     primaryFunction: "Pusat administrasi dan layanan terpadu UMS.",
-    interestingFact: "Bentuknya memiliki filosofi yang berkaitan dengan matahari Muhammadiyah.",
+    interestingFact:
+      "Saking ikoniknya gedung ini, halaman depan gedung sering dijadikan tempat foto wisudawan UMS.",
+    photos: [
+      "/photos/gedung-siti-walidah-1.jpg",
+      "/photos/gedung-siti-walidah-2.jpg",
+      "/photos/gedung-siti-walidah-3.jpg",
+    ],
   },
   {
     id: "L11",
@@ -135,7 +175,15 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Edutorium digunakan untuk wisuda, seminar, pertunjukan, dan berbagai kegiatan akademik maupun umum berskala besar.",
     primaryFunction: "Pusat kegiatan akademik dan acara berskala besar.",
-    interestingFact: "Edutorium menjadi panggung penting dari orientasi hingga wisuda mahasiswa.",
+    interestingFact:
+      "Edutorium KH Ahmad Dahlan merupakan gedung pertemuan terbesar se-Asia Tenggara yang dimiliki sebuah universitas, lho.",
+    photos: [
+      "/photos/edutorium-kh-ahmad-dahlan-1.jpg",
+      "/photos/edutorium-kh-ahmad-dahlan-2.jpg",
+      "/photos/edutorium-kh-ahmad-dahlan-3.jpg",
+    ],
+    link: "https://edutorium.ums.ac.id/",
+    linkLabel: "Kunjungi Website Edutorium UMS",
   },
   {
     id: "L12",
@@ -152,7 +200,14 @@ export const locations: CampusLocation[] = [
       "RS UMS AR Fachruddin merupakan fasilitas layanan kesehatan sekaligus rumah sakit pendidikan Universitas Muhammadiyah Surakarta.",
     primaryFunction: "Layanan kesehatan, kegawatdaruratan, dan pendidikan klinis.",
     interestingFact:
-      "Fasad kaca dengan panel geometris diagonal menjadi ciri visual utama gedung rumah sakit ini.",
+      "RS UMS dibangun dengan konsep rumah sakit pendidikan (teaching hospital) dan ramah lingkungan.",
+    photos: [
+      "/photos/rs-ums-ar-fachruddin-1.jpg",
+      "/photos/rs-ums-ar-fachruddin-2.jpg",
+      "/photos/rs-ums-ar-fachruddin-3.jpg",
+    ],
+    link: "https://rs.ums.ac.id/",
+    linkLabel: "Kunjungi Website RS UMS",
   },
   {
     id: "L09",
@@ -168,7 +223,14 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Masjid Hj. Sudalmiyah Rais merupakan pusat kegiatan ibadah dan keislaman di Kampus 2 UMS dengan arsitektur terbuka.",
     primaryFunction: "Ibadah, pembinaan, dan kegiatan keislaman.",
-    interestingFact: "Elemen visual masjid menampilkan identitas dua belas sinar Muhammadiyah.",
+    interestingFact:
+      "Nama Sudalmiyah Rais berasal dari tokoh perempuan Muhammadiyah yang menggagas berdirinya Universitas Muhammadiyah Surakarta.",
+    photos: [
+      "/photos/masjid-sudalmiyah-rais-1.jpg",
+      "/photos/masjid-sudalmiyah-rais-2.jpg",
+      "/photos/masjid-sudalmiyah-rais-3.jpg",
+      "/photos/masjid-sudalmiyah-rais-4.jpg",
+    ],
   },
   {
     id: "L14",
@@ -184,7 +246,12 @@ export const locations: CampusLocation[] = [
     shortDescription: "Layanan kesehatan gratis bagi mahasiswa UMS.",
     primaryFunction: "Pemeriksaan dan layanan kesehatan dasar bagi mahasiswa.",
     interestingFact:
-      "MMC membantu mahasiswa memperoleh layanan kesehatan kampus dengan akses yang mudah.",
+      "Layanan kesehatan gratis untuk semua mahasiswa UMS dengan menunjukkan KTM.",
+    photos: [
+      "/photos/mmc-1.jpg",
+      "/photos/mmc-2.jpg",
+      "/photos/mmc-3.jpg",
+    ],
   },
   {
     id: "L07",
@@ -200,7 +267,15 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Perpustakaan menyediakan koleksi buku, sumber digital, ruang diskusi, dan layanan pendukung pembelajaran serta penelitian mahasiswa.",
     primaryFunction: "Pusat literasi, sumber digital, dan ruang belajar.",
-    interestingFact: "Ruang diskusinya mendukung belajar mandiri maupun kerja kelompok.",
+    interestingFact:
+      "Gak hanya melayani peminjaman buku, Perpustakaan UMS menyediakan layanan digital seperti akses jurnal internasional hingga pelatihan publikasi ilmiah.",
+    photos: [
+      "/photos/perpustakaan-ums-1.jpg",
+      "/photos/perpustakaan-ums-2.jpg",
+      "/photos/perpustakaan-ums-3.jpg",
+    ],
+    link: "https://library.ums.ac.id/",
+    linkLabel: "Kunjungi Website Perpustakaan UMS",
   },
   {
     id: "L08",
@@ -215,7 +290,14 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Area danau dan kantin menjadi tempat mahasiswa beristirahat, makan, bertemu, serta berdiskusi dalam suasana ruang terbuka.",
     primaryFunction: "Ruang istirahat, makan, dan interaksi mahasiswa.",
-    interestingFact: "Pemandangan danau memberi suasana berbeda untuk jeda di antara kelas.",
+    interestingFact:
+      "Butuh tempat nyante menikmati senja? Kantin Tepi Danau paling cocok.",
+    photos: [
+      "/photos/danau-kantin-1.jpg",
+      "/photos/danau-kantin-2.jpg",
+      "/photos/danau-kantin-3.jpg",
+      "/photos/danau-kantin-4.jpg",
+    ],
   },
   {
     id: "L05",
@@ -231,7 +313,14 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Auditorium M. Djazman digunakan untuk seminar, pertemuan, presentasi, dan berbagai kegiatan kemahasiswaan di Kampus 1.",
     primaryFunction: "Seminar, presentasi, dan kegiatan kemahasiswaan.",
-    interestingFact: "Auditorium mempertemukan kegiatan akademik dengan ekspresi mahasiswa.",
+    interestingFact:
+      "Nama Mohammad Djazman diambil dari nama rektor pertama Universitas Muhammadiyah Surakarta.",
+    photos: [
+      "/photos/auditorium-m-djazman-1.jpg",
+      "/photos/auditorium-m-djazman-2.jpg",
+      "/photos/auditorium-m-djazman-3.jpg",
+      "/photos/auditorium-m-djazman-4.jpg",
+    ],
   },
   {
     id: "L06",
@@ -247,7 +336,13 @@ export const locations: CampusLocation[] = [
     shortDescription:
       "Masjid Fadhlurrahman menjadi salah satu pusat kegiatan ibadah dan pembinaan keislaman bagi sivitas akademika UMS di Kampus 1.",
     primaryFunction: "Ibadah dan pembinaan keislaman sivitas akademika.",
-    interestingFact: "Masjid ini menjadi bagian penting dari keseharian Kampus 1.",
+    interestingFact:
+      "Ciri khas masjid ini adalah menaranya yang berbentuk mirip cone es krim.",
+    photos: [
+      "/photos/masjid-fadhlurrahman-1.jpg",
+      "/photos/masjid-fadhlurrahman-2.jpg",
+      "/photos/masjid-fadhlurrahman-3.jpg",
+    ],
   },
 ];
 

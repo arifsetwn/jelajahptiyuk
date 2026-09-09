@@ -55,6 +55,31 @@ function Dialog({ title, onClose, children, className = "" }: { title: string; o
   );
 }
 
+function LandingCharacter() {
+  return (
+    <div className="landing-character-stage" aria-hidden="true">
+      <div className="landing-character-shadow" />
+      <div className="landing-character">
+        <div className="landing-character-head">
+          <div className="landing-character-hair" />
+          <div className="landing-character-cap"><span /></div>
+          <div className="landing-character-glasses"><i /><b /><i /></div>
+        </div>
+        <div className="landing-character-body">
+          <div className="landing-character-shirt" />
+          <div className="landing-character-arm arm-left"><span /></div>
+          <div className="landing-character-arm arm-right"><span /></div>
+        </div>
+        <div className="landing-character-legs">
+          <div className="landing-character-leg"><span /></div>
+          <div className="landing-character-leg"><span /></div>
+        </div>
+      </div>
+      <div className="landing-character-greeting">Hai! Yuk jelajah kampus <span>↗</span></div>
+    </div>
+  );
+}
+
 function StartScreen() {
   const start = useExperience((state) => state.start);
   const ready = useExperience((state) => state.assetsLoaded);
@@ -112,6 +137,7 @@ function StartScreen() {
           <span><strong>{umsTotal}</strong> ikon UMS</span>
         </div>
       </div>
+      <LandingCharacter />
     </section>
   );
 }
@@ -304,7 +330,7 @@ function LocationModal() {
             rel="noopener noreferrer"
           >
             <ArrowSquareOut size={18} weight="bold" />
-            Kunjungi {location.title}
+            {location.linkLabel ?? `Kunjungi ${location.title}`}
           </a>
         )}
         <button className="primary-button full-button" type="button" onClick={closeLocation}>Tutup dan lanjut jelajah</button>
@@ -345,7 +371,7 @@ function CampusMap() {
       <div className="map-heading">
         <div>
           <p className="eyebrow">Peta perjalanan</p>
-          <h2>Sebelas tempat untuk dikenali.</h2>
+          <h2>{locations.length} tempat untuk dikenali.</h2>
         </div>
         <p>{visited.length} lokasi sudah dikunjungi.</p>
       </div>
@@ -355,8 +381,10 @@ function CampusMap() {
           <div className="map-zone map-zone-kampus-2"><span>Kampus 2</span></div>
           <div className="map-zone map-zone-edutorium"><span>Edutorium</span></div>
           <div className="map-road road-horizontal" />
+          <div className="map-road road-horizontal-north" />
           <div className="map-road road-vertical-left" />
           <div className="map-road road-vertical-right" />
+          <div className="map-river" aria-hidden="true" />
           {locations.map((location) => {
             const left = `${((location.position[0] + 48) / 96) * 100}%`;
             const top = `${((location.position[2] + 48) / 96) * 100}%`;
