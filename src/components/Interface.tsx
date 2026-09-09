@@ -142,6 +142,35 @@ function StartScreen() {
   );
 }
 
+function BackgroundAudio() {
+  const started = useExperience((state) => state.started);
+  const soundEnabled = useExperience((state) => state.soundEnabled);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = 0.32;
+
+    if (started && soundEnabled) {
+      void audio.play().catch(() => {
+        // Browser dapat menolak audio sampai pengguna berinteraksi dengan halaman.
+      });
+    } else {
+      audio.pause();
+    }
+  }, [started, soundEnabled]);
+
+  return (
+    <audio
+      ref={audioRef}
+      src={`${import.meta.env.BASE_URL}apple_cider.ogg`}
+      loop
+      preload="auto"
+    />
+  );
+}
+
 function Header() {
   const [cameraSettingsOpen, setCameraSettingsOpen] = useState(false);
   const soundEnabled = useExperience((state) => state.soundEnabled);
@@ -158,7 +187,7 @@ function Header() {
 
   return (
     <header className="app-header">
-      <a className="compact-brand" href="/" aria-label="Jelajah PTI UMS, kembali ke awal">
+      <a className="compact-brand" href={import.meta.env.BASE_URL} aria-label="Jelajah PTI UMS, kembali ke awal">
         <Buildings size={22} weight="fill" />
         <span>jelajah<strong>PTI</strong></span>
       </a>
@@ -265,12 +294,13 @@ function PhotoCarousel({ photos, title, category }: { photos: string[]; title: s
   }, [photos.length]);
 
   const go = (idx: number) => { setCurrent((idx + photos.length) % photos.length); resetTimer(); };
+  const photoUrl = (src: string) => `${import.meta.env.BASE_URL}${src.replace(/^\//, "")}`;
 
   return (
     <div className="location-carousel" aria-label={`Foto ${title}`}>
       <div className="location-carousel-track" style={{ transform: `translateX(-${current * 100}%)` }}>
         {photos.map((src, i) => (
-          <img key={src} src={src} alt={`${title} foto ${i + 1}`} loading={i === 0 ? "eager" : "lazy"} />
+          <img key={src} src={photoUrl(src)} alt={`${title} foto ${i + 1}`} loading={i === 0 ? "eager" : "lazy"} />
         ))}
       </div>
       {photos.length > 1 && (
@@ -496,18 +526,21 @@ function TouchControls() {
 
 export function Interface() {
   const started = useExperience((state) => state.started);
-  if (!started) return <StartScreen />;
+  if (!started) return <><BackgroundAudio /><StartScreen /></>;
 
   return (
-    <div className="interface-layer">
-      <Header />
-      <ProgressPanel />
-      <NearbyPrompt />
-      <TouchControls />
-      <LocationModal />
-      <HelpModal />
-      <CampusMap />
-      <CompletionModal />
-    </div>
+    <>
+      <BackgroundAudio />
+      <div className="interface-layer">
+        <Header />
+        <ProgressPanel />
+        <NearbyPrompt />
+        <TouchControls />
+        <LocationModal />
+        <HelpModal />
+        <CampusMap />
+        <CompletionModal />
+      </div>
+    </>
   );
 }
