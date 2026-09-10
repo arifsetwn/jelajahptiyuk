@@ -506,6 +506,7 @@ function TouchControls() {
   const stop = () => setMoveInput({ x: 0, z: 0 });
   const bind = (x: number, z: number) => ({
     onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
+      event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
       setDirection(x, z);
     },
@@ -515,7 +516,11 @@ function TouchControls() {
   });
 
   return (
-    <div className="touch-controls" aria-label="Kontrol berjalan">
+    <div
+      className="touch-controls"
+      aria-label="Kontrol berjalan"
+      onContextMenu={(event) => event.preventDefault()}
+    >
       <button type="button" aria-label="Jalan maju" {...bind(0, -1)}>↑</button>
       <button type="button" aria-label="Jalan ke kiri" {...bind(-1, 0)}>←</button>
       <button type="button" aria-label="Jalan ke kanan" {...bind(1, 0)}>→</button>

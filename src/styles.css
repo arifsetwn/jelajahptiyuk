@@ -1371,6 +1371,9 @@ kbd {
   grid-template-rows: repeat(2, 46px);
   gap: 5px;
   pointer-events: auto;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .touch-controls button {
@@ -1382,6 +1385,10 @@ kbd {
   font-size: 1.15rem;
   font-weight: 800;
   touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .touch-controls button:first-child {

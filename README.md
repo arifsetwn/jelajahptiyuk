@@ -4,6 +4,12 @@ MVP website eksplorasi kampus 3D untuk promosi Program Studi Pendidikan Teknik I
 
 ![Banner Jelajah PTI UMS](./public/promo/jelajah-pti-ums-footer.png)
 
+## Informasi Website
+
+- Website: <https://ptiums.id/jelajah/>
+- Repositori: <https://github.com/arifsetwn/jelajahptiyuk>
+- Panduan kontribusi: [cara_kontribusi.md](./cara_kontribusi.md)
+
 ## Tech Stack
 
 - **Framework**: React with Vite (TypeScript)
