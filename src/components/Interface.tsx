@@ -385,6 +385,15 @@ function HelpModal() {
         <div><MapPin size={28} /><strong>E atau tombol</strong><span>Buka informasi lokasi</span></div>
         <div><MapTrifold size={28} /><strong>Peta</strong><span>Lihat seluruh destinasi</span></div>
       </div>
+      <a
+        className="repository-link"
+        href="https://github.com/arifsetwn/jelajahptiyuk"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span><strong>Repositori proyek</strong>github.com/arifsetwn/jelajahptiyuk</span>
+        <ArrowSquareOut size={20} weight="bold" aria-hidden="true" />
+      </a>
       <button className="primary-button full-button" type="button" onClick={() => setHelpOpen(false)}>Siap menjelajah</button>
     </Dialog>
   );
