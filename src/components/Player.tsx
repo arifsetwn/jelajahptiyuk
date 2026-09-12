@@ -10,6 +10,54 @@ const MOVE_SPEED = 7.4;
 const SITI_WALIDAH_ID = locations.find((location) => location.kind === "siti-walidah")?.id;
 const PLAYER_SPAWN = { x: -19, y: worldSurfaceY(-19, 42) + 1.2, z: 42 };
 
+function Backpack() {
+  return (
+    <group position={[0, 1.16, -0.39]}>
+      {/* Shoulder straps remain visible around the sides of the bag. */}
+      <mesh position={[-0.29, 0.1, 0.09]} rotation={[0.08, 0, -0.12]} castShadow>
+        <capsuleGeometry args={[0.045, 0.58, 4, 8]} />
+        <meshStandardMaterial color="#075f70" flatShading />
+      </mesh>
+      <mesh position={[0.29, 0.1, 0.09]} rotation={[0.08, 0, 0.12]} castShadow>
+        <capsuleGeometry args={[0.045, 0.58, 4, 8]} />
+        <meshStandardMaterial color="#075f70" flatShading />
+      </mesh>
+
+      {/* Main bag uses a low-poly capsule for a tidy rounded silhouette. */}
+      <mesh scale={[1.05, 1, 0.58]} castShadow>
+        <capsuleGeometry args={[0.3, 0.43, 5, 10]} />
+        <meshStandardMaterial color="#0b8092" flatShading roughness={0.86} />
+      </mesh>
+      <mesh position={[0, 0.3, -0.17]} scale={[1, 0.52, 0.48]} castShadow>
+        <sphereGeometry args={[0.31, 10, 6]} />
+        <meshStandardMaterial color="#087286" flatShading roughness={0.86} />
+      </mesh>
+
+      {/* Front pocket, side pockets, handle, and small reflective badge. */}
+      <mesh position={[0, -0.17, -0.225]} scale={[1, 0.78, 0.42]} castShadow>
+        <boxGeometry args={[0.38, 0.29, 0.14]} />
+        <meshStandardMaterial color="#1093a4" flatShading roughness={0.9} />
+      </mesh>
+      <mesh position={[-0.32, -0.12, -0.03]} scale={[0.55, 1, 0.72]} castShadow>
+        <boxGeometry args={[0.13, 0.25, 0.17]} />
+        <meshStandardMaterial color="#087286" flatShading />
+      </mesh>
+      <mesh position={[0.32, -0.12, -0.03]} scale={[0.55, 1, 0.72]} castShadow>
+        <boxGeometry args={[0.13, 0.25, 0.17]} />
+        <meshStandardMaterial color="#087286" flatShading />
+      </mesh>
+      <mesh position={[0, 0.49, -0.02]} rotation={[0, 0, Math.PI]} castShadow>
+        <torusGeometry args={[0.12, 0.027, 6, 12, Math.PI]} />
+        <meshStandardMaterial color="#075f70" flatShading />
+      </mesh>
+      <mesh position={[0, -0.17, -0.302]} castShadow>
+        <boxGeometry args={[0.12, 0.08, 0.012]} />
+        <meshStandardMaterial color="#6ed1d5" emissive="#1c6e79" emissiveIntensity={0.16} />
+      </mesh>
+    </group>
+  );
+}
+
 export function Player() {
   const body = useRef<RapierRigidBody>(null);
   const character = useRef<THREE.Group>(null);
@@ -187,6 +235,7 @@ export function Player() {
     >
       <CapsuleCollider args={[0.42, 0.38]} position={[0, 0.12, 0]} />
       <group ref={character} position={[0, -0.5, 0]}>
+        <Backpack />
         <mesh position={[0, 1.72, 0]} castShadow>
           <sphereGeometry args={[0.35, 12, 8]} />
           <meshStandardMaterial color="#d99d75" flatShading />
@@ -233,18 +282,24 @@ export function Player() {
           <capsuleGeometry args={[0.39, 0.48, 4, 8]} />
           <meshStandardMaterial color="#13a9b7" flatShading />
         </mesh>
-        <mesh position={[0, 1.08, 0.292]} castShadow>
-          <boxGeometry args={[0.25, 0.76, 0.08]} />
+        <mesh position={[0, 1.18, 0.294]} castShadow>
+          <boxGeometry args={[0.14, 0.42, 0.035]} />
           <meshStandardMaterial color="#f1f1ec" roughness={0.9} />
         </mesh>
-        <mesh position={[-0.13, 1.2, 0.34]} rotation={[0, 0, -0.16]} castShadow>
-          <coneGeometry args={[0.16, 0.55, 3]} />
-          <meshStandardMaterial color="#f1f1ec" />
+        <mesh position={[-0.115, 1.38, 0.314]} rotation={[0, 0, -0.46]} castShadow>
+          <boxGeometry args={[0.16, 0.32, 0.045]} />
+          <meshStandardMaterial color="#087f91" flatShading roughness={0.88} />
         </mesh>
-        <mesh position={[0.13, 1.2, 0.34]} rotation={[0, 0, 0.16]} castShadow>
-          <coneGeometry args={[0.16, 0.55, 3]} />
-          <meshStandardMaterial color="#f1f1ec" />
+        <mesh position={[0.115, 1.38, 0.314]} rotation={[0, 0, 0.46]} castShadow>
+          <boxGeometry args={[0.16, 0.32, 0.045]} />
+          <meshStandardMaterial color="#087f91" flatShading roughness={0.88} />
         </mesh>
+        {[1.13, 0.98].map((y) => (
+          <mesh key={y} position={[0, y, 0.325]} castShadow>
+            <sphereGeometry args={[0.028, 7, 5]} />
+            <meshStandardMaterial color="#075f70" flatShading />
+          </mesh>
+        ))}
 
         <group ref={leftArm} position={[-0.48, 1.34, 0]} rotation={[0, 0, -0.12]}>
           <mesh position={[0, -0.39, 0]} castShadow>

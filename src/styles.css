@@ -1031,6 +1031,53 @@ kbd {
   font-weight: 800;
 }
 
+.location-resource-section {
+  margin: 0 0 14px;
+}
+
+.location-resource-section h3 {
+  margin: 0 0 9px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.location-resource-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.location-resource-links a {
+  display: flex;
+  min-height: 44px;
+  padding: 9px 11px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  background: var(--surface-soft);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.location-resource-links a:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+  transform: translateY(-1px);
+}
+
+.location-resource-links svg {
+  flex: 0 0 auto;
+  color: var(--brand);
+}
+
 .help-dialog,
 .completion-dialog {
   padding: clamp(32px, 5vw, 56px);

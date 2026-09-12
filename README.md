@@ -10,6 +10,7 @@ MVP website eksplorasi kampus 3D untuk promosi Program Studi Pendidikan Teknik I
 - Repositori: <https://github.com/arifsetwn/jelajahptiyuk>
 - Panduan kontribusi: [cara_kontribusi.md](./cara_kontribusi.md)
 
+
 ## Tech Stack
 
 - **Framework**: React with Vite (TypeScript)
@@ -100,7 +101,3 @@ src/
 ├── styles.css
 └── types.ts
 ```
-
-## Catatan konten
-
-Deskripsi lokasi pada MVP merupakan draf berdasarkan PRD. Nama resmi, fungsi gedung, foto, logo, serta fakta yang akan dipublikasikan perlu divalidasi oleh PTI, FKIP, Humas, dan unit UMS terkait.

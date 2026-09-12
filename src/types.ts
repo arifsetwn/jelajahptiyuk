@@ -35,6 +35,10 @@ export interface CampusLocation {
   photos?: string[];
   link?: string;
   linkLabel?: string;
+  links?: Array<{
+    label: string;
+    url: string;
+  }>;
 }
 
 export type CameraMode = "follow" | "overview";

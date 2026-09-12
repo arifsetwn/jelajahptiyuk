@@ -26,4 +26,18 @@ describe("campus locations", () => {
     expect(getLocation("unknown")).toBeNull();
     expect(getLocation(null)).toBeNull();
   });
+
+  it("provides the six official information links for the PTI office", () => {
+    const office = locations.find((location) => location.slug === "kantor-prodi-pti");
+
+    expect(office?.links).toHaveLength(6);
+    expect(office?.links?.map((item) => item.label)).toEqual([
+      "Pimpinan",
+      "Dosen Pengajar",
+      "Kurikulum",
+      "Karya mahasiswa",
+      "Prestasi",
+      "Beasiswa",
+    ]);
+  });
 });

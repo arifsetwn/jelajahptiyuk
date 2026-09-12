@@ -352,6 +352,19 @@ function LocationModal() {
           </div>
         </div>
         <div className="visited-confirmation"><CheckCircle size={20} weight="fill" /> Lokasi tercatat dalam perjalananmu</div>
+        {location.links && location.links.length > 0 && (
+          <section className="location-resource-section" aria-label={`Informasi ${location.title}`}>
+            <h3>Informasi lebih lanjut</h3>
+            <div className="location-resource-links">
+              {location.links.map((item) => (
+                <a key={item.url} href={item.url} target="_blank" rel="noopener noreferrer">
+                  <span>{item.label}</span>
+                  <ArrowSquareOut size={17} weight="bold" aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
         {location.link && (
           <a
             className="primary-button full-button location-link-button"

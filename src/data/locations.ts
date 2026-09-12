@@ -139,6 +139,14 @@ export const locations: CampusLocation[] = [
     ],
     link: "https://pti.ums.ac.id/",
     linkLabel: "Kunjungi Website PTI UMS",
+    links: [
+      { label: "Pimpinan", url: "https://pti.ums.ac.id/struktur-organisasi/" },
+      { label: "Dosen Pengajar", url: "https://pti.ums.ac.id/dosen/" },
+      { label: "Kurikulum", url: "https://pti.ums.ac.id/kurikulum/" },
+      { label: "Karya mahasiswa", url: "https://pti.ums.ac.id/category/karya/" },
+      { label: "Prestasi", url: "https://pti.ums.ac.id/category/prestasi/" },
+      { label: "Beasiswa", url: "https://kemahasiswaan.ums.ac.id/category/beasiswa/" },
+    ],
   },
   {
     id: "L10",

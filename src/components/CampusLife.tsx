@@ -2,7 +2,29 @@ import { useFrame } from "@react-three/fiber";
 import { CuboidCollider, RigidBody, type RapierRigidBody } from "@react-three/rapier";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import { worldSurfaceTilt, worldSurfaceY } from "../worldGeometry";
+import { worldSurfaceNormal, worldSurfaceTilt, worldSurfaceY } from "../worldGeometry";
+
+const vehicleUp = new THREE.Vector3();
+const vehicleForward = new THREE.Vector3();
+const vehicleRight = new THREE.Vector3();
+const vehicleBasis = new THREE.Matrix4();
+
+function setVehicleSurfaceRotation(
+  target: THREE.Quaternion,
+  x: number,
+  z: number,
+  directionX: number,
+  directionZ: number,
+) {
+  const [normalX, normalY, normalZ] = worldSurfaceNormal(x, z);
+  vehicleUp.set(normalX, normalY, normalZ);
+  vehicleForward.set(directionX, 0, directionZ).normalize();
+  vehicleForward.addScaledVector(vehicleUp, -vehicleForward.dot(vehicleUp)).normalize();
+  vehicleRight.crossVectors(vehicleUp, vehicleForward).normalize();
+  vehicleForward.crossVectors(vehicleRight, vehicleUp).normalize();
+  vehicleBasis.makeBasis(vehicleRight, vehicleUp, vehicleForward);
+  target.setFromRotationMatrix(vehicleBasis);
+}
 
 function Bird({ radius, height, speed, phase }: { radius: number; height: number; speed: number; phase: number }) {
   const bird = useRef<THREE.Group>(null);
@@ -75,6 +97,7 @@ function Airplane() {
 function CampusBus({ color = "#d92f32", phase = 0 }: { color?: string; phase?: number }) {
   const bus = useRef<RapierRigidBody>(null);
   const wheelGroups = useRef<Array<THREE.Group | null>>([]);
+  const surfaceRotation = useMemo(() => new THREE.Quaternion(), []);
   const route = useMemo(
     () => new THREE.CatmullRomCurve3(
       [
@@ -101,10 +124,9 @@ function CampusBus({ color = "#d92f32", phase = 0 }: { color?: string; phase?: n
     const tangent = route.getTangentAt(progress);
     const x = routePoint.x;
     const z = routePoint.z;
-    bus.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.1, z });
-    const tilt = worldSurfaceTilt(x, z);
-    const rotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(tilt[0], Math.atan2(tangent.x, tangent.z), tilt[2]));
-    bus.current.setNextKinematicRotation(rotation);
+    bus.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.09, z });
+    setVehicleSurfaceRotation(surfaceRotation, x, z, tangent.x, tangent.z);
+    bus.current.setNextKinematicRotation(surfaceRotation);
     wheelGroups.current.forEach((wheel) => {
       if (wheel) wheel.rotation.x -= delta * 8;
     });
@@ -227,15 +249,16 @@ function Cloud({ base, speed, scale = 1 }: { base: [number, number, number]; spe
 
 function GojekMotor() {
   const motor = useRef<THREE.Group>(null);
+  const surfaceRotation = useMemo(() => new THREE.Quaternion(), []);
 
   useFrame(({ clock }) => {
     if (!motor.current) return;
     const progress = (clock.elapsedTime * 0.055) % 1;
     const x = -45 + progress * 90;
     const z = 11.25;
-    motor.current.position.set(x, worldSurfaceY(x, z) + 0.12, z);
-    const tilt = worldSurfaceTilt(x, z);
-    motor.current.rotation.set(tilt[0], Math.PI / 2, tilt[2]);
+    motor.current.position.set(x, worldSurfaceY(x, z) + 0.145, z);
+    setVehicleSurfaceRotation(surfaceRotation, x, z, 1, 0);
+    motor.current.quaternion.copy(surfaceRotation);
   });
 
   return (
@@ -424,14 +447,15 @@ function SoccerPlayers() {
 
 function CampusCar() {
   const car = useRef<RapierRigidBody>(null);
+  const surfaceRotation = useMemo(() => new THREE.Quaternion(), []);
   useFrame(({ clock }) => {
     if (!car.current) return;
     const progress = (clock.elapsedTime * 0.035 + 0.38) % 1;
     const x = 43 - progress * 86;
     const z = 8.4;
-    car.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.12, z });
-    const tilt = worldSurfaceTilt(x, z);
-    car.current.setNextKinematicRotation(new THREE.Quaternion().setFromEuler(new THREE.Euler(tilt[0], -Math.PI / 2, tilt[2])));
+    car.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.145, z });
+    setVehicleSurfaceRotation(surfaceRotation, x, z, -1, 0);
+    car.current.setNextKinematicRotation(surfaceRotation);
   });
   return (
     <RigidBody ref={car} type="kinematicPosition" colliders={false} position={[0, 0, 8.4]}>
@@ -462,14 +486,15 @@ function BecakWheel({ position, radius = 0.72 }: { position: [number, number, nu
 
 function Becak() {
   const becak = useRef<RapierRigidBody>(null);
+  const surfaceRotation = useMemo(() => new THREE.Quaternion(), []);
   useFrame(({ clock }) => {
     if (!becak.current) return;
     const progress = (clock.elapsedTime * 0.027 + 0.7) % 1;
     const x = -42 + progress * 84;
     const z = 11.7;
-    becak.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.08, z });
-    const tilt = worldSurfaceTilt(x, z);
-    becak.current.setNextKinematicRotation(new THREE.Quaternion().setFromEuler(new THREE.Euler(tilt[0], Math.PI / 2, tilt[2])));
+    becak.current.setNextKinematicTranslation({ x, y: worldSurfaceY(x, z) + 0.09, z });
+    setVehicleSurfaceRotation(surfaceRotation, x, z, 1, 0);
+    becak.current.setNextKinematicRotation(surfaceRotation);
   });
   return (
     <RigidBody ref={becak} type="kinematicPosition" colliders={false} position={[0, 0, 11.7]}>
