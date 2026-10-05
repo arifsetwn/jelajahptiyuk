@@ -1,3 +1,7 @@
+import { useFishing } from "../fishing/useFishing";
+import { FishingSpot } from "../fishing/FishingSpot";
+import { SportsScene } from "../sports/SportsScene";
+import { useSports } from "../sports/useSports";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { CuboidCollider, CylinderCollider, Physics, RigidBody } from "@react-three/rapier";
@@ -129,6 +133,8 @@ function LocationMarker({
   label: string;
   offsetZ?: number;
 }) {
+  const fishingActive = useFishing(s => s.session.phase !== "idle");
+  const sportsActive = useSports(s => s.session.phase !== "idle");
   const marker = useRef<THREE.Group>(null);
   const visited = useExperience((state) => state.visitedLocationIds.includes(id));
   const markerZ = position[2] + offsetZ;
@@ -139,7 +145,7 @@ function LocationMarker({
   });
 
   return (
-    <group position={markerBase}>
+    <group position={markerBase} visible={!fishingActive && !sportsActive}>
       <group ref={marker} position={[0, 1.9, 0]}>
         <mesh rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[0.58, 0.13, 8, 20]} />
@@ -149,12 +155,12 @@ function LocationMarker({
           <coneGeometry args={[0.23, 0.52, 8]} />
           <meshStandardMaterial color={visited ? "#4e9b72" : accent} />
         </mesh>
-        <Html center distanceFactor={13} position={[0, 0.85, 0]} style={{ pointerEvents: "none" }}>
+        {!fishingActive && !sportsActive && <Html center distanceFactor={13} position={[0, 0.85, 0]} style={{ pointerEvents: "none" }}>
           <div className={`world-label ${visited ? "is-visited" : ""}`}>
             <span>{visited ? "✓" : id.replace("L", "")}</span>
             {label}
           </div>
-        </Html>
+        </Html>}
       </group>
     </group>
   );
@@ -265,6 +271,7 @@ function World() {
       <CampusOneGate />
       <CampusStreetStalls />
       <CampusSportsCourts />
+      <SportsScene />
       <CampusTrees />
       <CampusBusStop />
       <CampusLife />
@@ -281,6 +288,7 @@ function World() {
           offsetZ={location.kind === "edutorium" ? 7.8 : location.kind === "lakeside" ? 8 : location.kind === "siti-walidah" ? 9.4 : location.kind === "hospital" ? 4.7 : location.kind === "pti-office" || location.kind === "medical-center" ? 3 : 4.2}
         />
       ))}
+      <FishingSpot />
       <Player />
     </>
   );

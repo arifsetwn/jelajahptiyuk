@@ -95,3 +95,17 @@ it("accepts touch input before any keyboard key has been pressed", () => {
   expect(simulation.body.linvel().x).toBeGreaterThan(0);
   expect(simulation.body.linvel().z).toBe(0);
 });
+
+it('freezes movement while fishing and restores position and input afterwards', async () => {
+  const { useFishing } = await import('../fishing/useFishing');
+  useExperience.setState({ started: true, helpOpen: false, moveInput: { x: 1, z: 1 } });
+  const before = simulation.body.translation();
+  useFishing.setState({ nearby: true, session: { phase: 'ready' } });
+  step();
+  expect(simulation.body.linvel().x).toBe(0);
+  expect(simulation.body.linvel().z).toBe(0);
+  useFishing.getState().close(); step();
+  expect(simulation.body.translation().x).toBeCloseTo(before.x);
+  expect(simulation.body.translation().z).toBeCloseTo(before.z);
+  expect(useExperience.getState().moveInput).toEqual({ x: 0, z: 0 });
+});

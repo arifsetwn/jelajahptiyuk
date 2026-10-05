@@ -1,3 +1,5 @@
+import { useFishing } from "../fishing/useFishing";
+import { useSports } from "../sports/useSports";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { locations } from "../data/locations";
@@ -62,6 +64,7 @@ export const useExperience = create<ExperienceState>()(
         if (get().nearbyLocationId !== id) set({ nearbyLocationId: id });
       },
       openLocation: (id) => {
+        if (useFishing.getState().session.phase !== "idle" || useSports.getState().session.phase !== "idle") return;
         const visited = get().visitedLocationIds;
         set({
           activeLocationId: id,
@@ -73,8 +76,8 @@ export const useExperience = create<ExperienceState>()(
         const complete = get().visitedLocationIds.length === locations.length;
         set({ activeLocationId: null, completionOpen: complete });
       },
-      setMapOpen: (open) => set({ mapOpen: open, helpOpen: false }),
-      setHelpOpen: (open) => set({ helpOpen: open, mapOpen: false }),
+      setMapOpen: (open) => { if (open) { useFishing.getState().close(); useSports.getState().close(); } set({ mapOpen: open, helpOpen: false }); },
+      setHelpOpen: (open) => { if (open) { useFishing.getState().close(); useSports.getState().close(); } set({ helpOpen: open, mapOpen: false }); },
       setCompletionOpen: (open) => set({ completionOpen: open }),
       toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
       toggleQuality: () =>

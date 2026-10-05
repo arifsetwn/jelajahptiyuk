@@ -3,6 +3,7 @@ import { CuboidCollider, RigidBody, type RapierRigidBody } from "@react-three/ra
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { worldSurfaceNormal, worldSurfaceTilt, worldSurfaceY } from "../worldGeometry";
+import { useSports } from '../sports/useSports';
 
 const vehicleUp = new THREE.Vector3();
 const vehicleForward = new THREE.Vector3();
@@ -425,6 +426,7 @@ function StudentBoat() {
 }
 
 function SoccerPlayers() {
+  const sportsActive = useSports(s => s.session.kind === 'soccer' && s.session.phase !== 'idle');
   const ball = useRef<THREE.Mesh>(null);
   const runnerA = useRef<THREE.Group>(null);
   const runnerB = useRef<THREE.Group>(null);
@@ -436,6 +438,7 @@ function SoccerPlayers() {
     if (runnerA.current) runnerA.current.position.x = sway * 0.8 - 1.25;
     if (runnerB.current) runnerB.current.position.x = sway * 0.8 + 1.25;
   });
+  if (sportsActive) return null;
   return (
     <group position={[x, worldSurfaceY(x, z) + 0.13, z]} rotation={worldSurfaceTilt(x, z)}>
       <group ref={runnerA} position={[-1.25, 0, 0]} rotation={[0, 0.3, 0]}><SimpleStudent shirt="#f0c63e" /></group>

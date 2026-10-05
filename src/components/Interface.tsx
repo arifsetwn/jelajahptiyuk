@@ -1,3 +1,7 @@
+import { FishingOverlay } from "../fishing/FishingOverlay";
+import { useFishing } from "../fishing/useFishing";
+import { SportsOverlay } from "../sports/SportsOverlay";
+import { useSports } from "../sports/useSports";
 import {
   ArrowCounterClockwise,
   ArrowsOutLineVertical,
@@ -260,6 +264,8 @@ function ProgressPanel() {
 }
 
 function NearbyPrompt() {
+  const fishingBusy = useFishing(s => s.nearby || s.session.phase !== "idle");
+  const sportsBusy = useSports(s => s.nearby !== null || s.session.phase !== "idle");
   const nearbyId = useExperience((state) => state.nearbyLocationId);
   const activeId = useExperience((state) => state.activeLocationId);
   const mapOpen = useExperience((state) => state.mapOpen);
@@ -267,7 +273,7 @@ function NearbyPrompt() {
   const openLocation = useExperience((state) => state.openLocation);
   const location = getLocation(nearbyId);
 
-  if (!location || activeId || mapOpen || helpOpen) return null;
+  if (!location || activeId || mapOpen || helpOpen || fishingBusy || sportsBusy) return null;
 
   return (
     <div className="nearby-prompt">
@@ -397,6 +403,7 @@ function HelpModal() {
         <div><HandTap size={28} /><strong>Tombol arah</strong><span>Berjalan di ponsel</span></div>
         <div><MapPin size={28} /><strong>E atau tombol</strong><span>Buka informasi lokasi</span></div>
         <div><MapTrifold size={28} /><strong>Peta</strong><span>Lihat seluruh destinasi</span></div>
+        <div><HandTap size={28} /><strong>Basket & soccer</strong><span>Dekati lapangan untuk bermain mini game</span></div>
       </div>
       <a
         className="repository-link"
@@ -523,7 +530,10 @@ function CompletionModal() {
 }
 
 function TouchControls() {
+  const fishingActive = useFishing(s => s.session.phase !== "idle");
+  const sportsActive = useSports(s => s.session.phase !== "idle");
   const setMoveInput = useExperience((state) => state.setMoveInput);
+  if (fishingActive || sportsActive) return null;
   const setDirection = (x: number, z: number) => setMoveInput({ x, z });
   const stop = () => setMoveInput({ x: 0, z: 0 });
   const bind = (x: number, z: number) => ({
@@ -552,6 +562,8 @@ function TouchControls() {
 }
 
 export function Interface() {
+  const fishingActive = useFishing(s => s.session.phase !== "idle");
+  const sportsActive = useSports(s => s.session.phase !== "idle");
   const started = useExperience((state) => state.started);
   if (!started) return <><BackgroundAudio /><StartScreen /></>;
 
@@ -560,9 +572,11 @@ export function Interface() {
       <BackgroundAudio />
       <div className="interface-layer">
         <Header />
-        <ProgressPanel />
+        {!fishingActive && !sportsActive && <ProgressPanel />}
         <NearbyPrompt />
         <TouchControls />
+        <FishingOverlay />
+        <SportsOverlay />
         <LocationModal />
         <HelpModal />
         <CampusMap />

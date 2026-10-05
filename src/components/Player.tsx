@@ -1,3 +1,7 @@
+import { useFishing } from "../fishing/useFishing";
+import { FISHING_STAND, FISHING_FLOAT, FISHING_ROTATION, FISHING_BODY } from "../fishing/geometry";
+import { useSports } from '../sports/useSports';
+import { courtOrigin, sportBody, sportPrompt, sportRotation } from '../sports/geometry';
 import { CapsuleCollider, RigidBody, useBeforePhysicsStep, type RapierRigidBody } from "@react-three/rapier";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
@@ -65,6 +69,9 @@ export function Player() {
   const rightArm = useRef<THREE.Group>(null);
   const leftLeg = useRef<THREE.Group>(null);
   const rightLeg = useRef<THREE.Group>(null);
+  const wasActivity = useRef(false);
+  const returnPosition = useRef<THREE.Vector3 | null>(null);
+  const returnRotation = useRef(new THREE.Quaternion());
   const walkPhase = useRef(0);
   const isMoving = useRef(false);
   const keys = useRef<Record<string, boolean>>({});
@@ -82,6 +89,14 @@ export function Player() {
       }
       if ((event.code === "KeyE" || event.code === "Space") && !event.repeat) {
         const state = useExperience.getState();
+        if (useFishing.getState().session.phase !== "idle" || useSports.getState().session.phase !== "idle") return;
+        const sport = useSports.getState().nearby;
+        if (state.started && sport && !state.activeLocationId && !state.mapOpen && !state.helpOpen && !state.completionOpen) {
+          event.preventDefault(); keys.current = {}; state.setMoveInput({ x: 0, z: 0 }); useSports.getState().start(sport); return;
+        }
+        if (state.started && useFishing.getState().nearby && !state.activeLocationId && !state.mapOpen && !state.helpOpen && !state.completionOpen) {
+          event.preventDefault(); keys.current = {}; state.setMoveInput({ x: 0, z: 0 }); useFishing.getState().start(); return;
+        }
         if (state.nearbyLocationId && !state.activeLocationId && !state.mapOpen && !state.helpOpen) {
           event.preventDefault();
           state.openLocation(state.nearbyLocationId);
@@ -113,6 +128,28 @@ export function Player() {
 
     const state = useExperience.getState();
     const position = rigidBody.translation();
+    const sportSession = useSports.getState().session;
+    if (useFishing.getState().session.phase !== "idle" || (sportSession.phase !== 'idle' && sportSession.kind)) {
+      if (!wasActivity.current) {
+        returnPosition.current = new THREE.Vector3(position.x, position.y, position.z);
+        returnRotation.current.copy(rigidBody.rotation());
+      }
+      wasActivity.current = true;
+      keys.current = {};
+      isMoving.current = false;
+      rigidBody.setTranslation(sportSession.kind && sportSession.phase !== 'idle' ? sportBody(sportSession.kind, sportSession.attempt) : FISHING_BODY, true);
+      rigidBody.setRotation(sportSession.kind && sportSession.phase !== 'idle' ? sportRotation(sportSession.kind) : FISHING_ROTATION, true);
+      rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      return;
+    }
+    if (wasActivity.current) {
+      wasActivity.current = false; keys.current = {};
+      state.setMoveInput({ x: 0, z: 0 });
+      if (returnPosition.current) rigidBody.setTranslation(returnPosition.current, true);
+      rigidBody.setRotation(returnRotation.current, true);
+      rigidBody.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      return;
+    }
     const paused = !state.started || Boolean(state.activeLocationId || state.mapOpen || state.helpOpen || state.completionOpen);
 
     let x = 0;
@@ -156,10 +193,18 @@ export function Player() {
     if (isMoving.current) walkPhase.current += delta * 9;
     const swing = isMoving.current ? Math.sin(walkPhase.current) * 0.62 : 0;
     const oppositeSwing = -swing;
+    const fishingPhase = useFishing.getState().session.phase;
+    const fishing = fishingPhase !== "idle";
+    const sportSession = useSports.getState().session;
+    const sportsActive = sportSession.phase !== 'idle' && sportSession.kind;
+    const shooting = sportSession.phase === 'shooting';
     if (leftArm.current) leftArm.current.rotation.x = THREE.MathUtils.lerp(leftArm.current.rotation.x, oppositeSwing, animationSpeed);
-    if (rightArm.current) rightArm.current.rotation.x = THREE.MathUtils.lerp(rightArm.current.rotation.x, swing, animationSpeed);
+    if (rightArm.current) {
+      const reelPull = fishingPhase === "reeling" ? Math.sin(performance.now() * 0.014) * 0.16 : 0;
+      rightArm.current.rotation.x = THREE.MathUtils.lerp(rightArm.current.rotation.x, fishing ? -1.05 + reelPull : sportsActive && sportSession.kind === 'basket' ? shooting ? -2 : -.5 : swing, animationSpeed);
+    }
     if (leftLeg.current) leftLeg.current.rotation.x = THREE.MathUtils.lerp(leftLeg.current.rotation.x, swing, animationSpeed);
-    if (rightLeg.current) rightLeg.current.rotation.x = THREE.MathUtils.lerp(rightLeg.current.rotation.x, oppositeSwing, animationSpeed);
+    if (rightLeg.current) rightLeg.current.rotation.x = THREE.MathUtils.lerp(rightLeg.current.rotation.x, shooting && sportSession.kind === 'soccer' ? -.8 : oppositeSwing, animationSpeed);
     if (character.current) {
       const bob = isMoving.current ? Math.abs(Math.sin(walkPhase.current * 2)) * 0.045 : 0;
       character.current.position.y = THREE.MathUtils.lerp(character.current.position.y, -0.5 + bob, animationSpeed);
@@ -170,6 +215,16 @@ export function Player() {
       );
     }
 
+    useFishing.getState().setNearby(Math.hypot(position.x - FISHING_STAND.x, position.z - FISHING_STAND.z) < 3);
+    let nearestSport: 'basket' | 'soccer' | null = null;
+    let nearestSportDistance = 3.8;
+    for (const kind of ['basket', 'soccer'] as const) {
+      const prompt = sportPrompt(kind);
+      const distance = Math.hypot(position.x - prompt.x, position.z - prompt.z);
+      if (distance < nearestSportDistance) { nearestSportDistance = distance; nearestSport = kind; }
+    }
+    // Keep the approach spot selected while the player is placed on the court.
+    if (!sportsActive) useSports.getState().setNearby(nearestSport);
     let nearestId: string | null = null;
     let nearestDistance = 5.5;
     for (const location of locations) {
@@ -185,7 +240,21 @@ export function Player() {
       state.setNearbyLocation(nearestId);
     }
 
-    if (state.cameraMode === "overview") {
+    if (sportsActive) {
+      const origin = courtOrigin(sportSession.kind!);
+      const portrait = size.width / size.height < .82;
+      cameraTarget.set(origin.x + (portrait ? 3 : 8), origin.y + (portrait ? 8 : 9), origin.z + (portrait ? 15 : 11));
+      lookTarget.set(origin.x, origin.y + 1.2, origin.z - 1.8);
+    } else if (fishing) {
+      cameraTarget.set(FISHING_STAND.x - 8, FISHING_STAND.y + 10, FISHING_STAND.z + 11);
+      lookTarget.copy(FISHING_FLOAT).lerp(FISHING_STAND, .45);
+      lookTarget.y += size.width < 600 ? -.5 : 1.5;
+      // Leave room for the bottom panel in portrait and the right panel in landscape.
+      if (size.height < 500 && size.width > size.height) {
+        lookTarget.x += 3;
+        lookTarget.z += 2.2;
+      }
+    } else if (state.cameraMode === "overview") {
       cameraTarget.set(0, 78, 76);
       lookTarget.set(0, -6, 0);
     } else {

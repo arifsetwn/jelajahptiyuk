@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { CampusLocation } from "../types";
 import { worldSurfaceTilt, worldSurfaceY } from "../worldGeometry";
+import { useSports } from "../sports/useSports";
 
 const wall = "#f1ead9";
 const dark = "#173456";
@@ -1386,6 +1387,7 @@ function BasketballHoop({ z, rotationY = 0 }: { z: number; rotationY?: number })
 }
 
 export function CampusSportsCourts() {
+  const activeKind = useSports(s => s.session.phase === 'idle' ? null : s.session.kind);
   const soccerX = 3.8;
   const basketX = 12;
   const z = -12;
@@ -1402,7 +1404,7 @@ export function CampusSportsCourts() {
         {[-5.25, 5.25].map((goalZ) => <Box key={`soccer-end-${goalZ}`} position={[0, 0.115, goalZ]} scale={[7.02, 0.025, 0.07]} color="#f4f1d8" radius={0.005} />)}
         <SoccerGoal z={-5.18} />
         <SoccerGoal z={5.18} rotationY={Math.PI} />
-        <mesh position={[0.3, 0.28, 1.2]} castShadow><sphereGeometry args={[0.2, 10, 7]} /><meshStandardMaterial color="#f5f1dc" flatShading /></mesh>
+        {activeKind !== 'soccer' && <mesh position={[0.3, 0.28, 1.2]} castShadow><sphereGeometry args={[0.2, 10, 7]} /><meshStandardMaterial color="#f5f1dc" flatShading /></mesh>}
       </group>
 
       <group position={[basketX, worldSurfaceY(basketX, z) + 0.08, z]} rotation={worldSurfaceTilt(basketX, z)}>
@@ -1413,7 +1415,7 @@ export function CampusSportsCourts() {
         <mesh position={[0, 0.116, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[1.02, 1.09, 32]} /><meshBasicMaterial color="#f3cf55" side={THREE.DoubleSide} /></mesh>
         <BasketballHoop z={-4.72} />
         <BasketballHoop z={4.72} rotationY={Math.PI} />
-        <mesh position={[-0.8, 0.27, -0.6]} castShadow><sphereGeometry args={[0.2, 10, 7]} /><meshStandardMaterial color="#dc7337" flatShading /></mesh>
+        {activeKind !== 'basket' && <mesh position={[-0.8, 0.27, -0.6]} castShadow><sphereGeometry args={[0.2, 10, 7]} /><meshStandardMaterial color="#dc7337" flatShading /></mesh>}
       </group>
     </group>
   );
